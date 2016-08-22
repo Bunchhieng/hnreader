@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"runtime"
 	"sort"
 	"strconv"
 	"time"
@@ -85,7 +86,7 @@ func main() {
 				Usage:   "start hnreader with default option (10 news and chrome browser)",
 				Flags: []cli.Flag{
 					&cli.UintFlag{Name: "tabs", Value: 10, Aliases: []string{"t"}, Usage: "Specify value of tabs \t"},
-					&cli.StringFlag{Name: "browser", Value: "chrome", Aliases: []string{"b"}, Usage: "Specify broswer \t"},
+					&cli.StringFlag{Name: "browser", Value: checkOS(), Aliases: []string{"b"}, Usage: "Specify broswer \t"},
 				},
 				Action: func(c *cli.Context) error {
 					return handle(runApp(int(c.Int("tabs")), string(c.String("browser"))))
@@ -118,7 +119,7 @@ func runApp(tabs int, browser string) error {
 		}
 		err := open.RunWith(news[k], browser)
 		if err != nil {
-			fmt.Printf(Red("%s is not found on this computer..."), browser)
+			fmt.Printf(Red("%s is not found on this computer...\n"), browser)
 			os.Exit(1)
 		}
 	}
@@ -142,6 +143,16 @@ func getStories(count int) (map[int]string, error) {
 	}
 
 	return news, nil
+}
+
+func checkOS() string {
+	chrome := ""
+	if runtime.GOOS == "windows" {
+		chrome = "chrome"
+	} else if runtime.GOOS == "darwin" {
+		chrome = "Google Chrome"
+	}
+	return chrome
 }
 
 func handle(err error) error {
