@@ -16,10 +16,10 @@ Tired of clicking each link and for the sake of learning Golang. I read hacker n
       `hnreader run -t 7 -b "chrome"`
 
 ## Credits
-* [urfave/cli]("https://github.com/urfave/cli")
-* [Fatih Arslan]("https://github.com/fatih/color")
-* [Martin Angers]("https://github.com/PuerkitoBio/goquery")
-* [skratchdot]("https://github.com/skratchdot/open-golang")
+* [urfave/cli](https://github.com/urfave/cli)
+* [Fatih Arslan](https://github.com/fatih/color)
+* [Martin Angers](https://github.com/PuerkitoBio/goquery)
+* [skratchdot](https://github.com/skratchdot/open-golang)
 
 #### License
 
