@@ -118,7 +118,7 @@ func runApp(tabs int, browser string) error {
 		}
 		err := open.RunWith(news[k], browser)
 		if err != nil {
-			fmt.Printf("%s is not found on this computer...", browser)
+			fmt.Printf(Red("%s is not found on this computer..."), browser)
 			os.Exit(1)
 		}
 	}
