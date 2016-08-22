@@ -60,15 +60,6 @@ func (writer logWriter) Write(bytes []byte) (int, error) {
 func main() {
 	app := Init()
 
-	header := func() error {
-		app.Information()
-		gopath := os.Getenv("GOPATH")
-		if gopath == "" {
-			log.Fatal(Red("$GOPATH isn't set up properly."))
-		}
-		return nil
-	}
-
 	cli := &cli.App{
 		Name:    app.Name,
 		Version: app.Version,
@@ -83,16 +74,17 @@ func main() {
 			{
 				Name:    "run",
 				Aliases: []string{"r"},
-				Usage:   "start hnreader with default option (10 news and chrome browser)",
+				Usage:   "Start hnreader with default option (10 news and chrome browser)",
 				Flags: []cli.Flag{
 					&cli.UintFlag{Name: "tabs", Value: 10, Aliases: []string{"t"}, Usage: "Specify value of tabs \t"},
-					&cli.StringFlag{Name: "browser", Value: checkOS(), Aliases: []string{"b"}, Usage: "Specify broswer \t"},
+					&cli.StringFlag{Name: "browser", Value: CheckOS(), Aliases: []string{"b"}, Usage: "Specify broswer \t"},
 				},
 				Action: func(c *cli.Context) error {
-					return handle(runApp(int(c.Int("tabs")), string(c.String("browser"))))
+					return HandleErr(RunApp(int(c.Int("tabs")), string(c.String("browser"))))
 				},
 				Before: func(c *cli.Context) error {
-					header()
+					app.Information()
+					Header()
 					return nil
 				},
 			},
@@ -102,16 +94,16 @@ func main() {
 	cli.Run(os.Args)
 }
 
-func runApp(tabs int, browser string) error {
-	news, err := getStories(tabs)
+func RunApp(tabs int, browser string) error {
+	news, err := GetStories(tabs)
+	HandleErr(err)
 	// To store the keys in slice in sorted order
 	var keys []int
 	for k := range news {
 		keys = append(keys, k)
 	}
+	// Sort map keys
 	sort.Ints(keys)
-
-	handle(err)
 
 	for _, k := range keys {
 		if k == tabs {
@@ -126,13 +118,14 @@ func runApp(tabs int, browser string) error {
 	return nil
 }
 
-func getStories(count int) (map[int]string, error) {
+// Get list of stories based on number of input
+func GetStories(count int) (map[int]string, error) {
 	news := make(map[int]string)
 	// 30 news per page
 	pages := count / 30
 	for i := 0; i <= pages; i++ {
 		doc, err := goquery.NewDocument("https://news.ycombinator.com/news?p=" + strconv.Itoa(pages))
-		handle(err)
+		HandleErr(err)
 		doc.Find("a.storylink").Each(func(i int, s *goquery.Selection) {
 			href, exist := s.Attr("href")
 			if !exist {
@@ -145,7 +138,7 @@ func getStories(count int) (map[int]string, error) {
 	return news, nil
 }
 
-func checkOS() string {
+func CheckOS() string {
 	chrome := ""
 	if runtime.GOOS == "windows" {
 		chrome = "chrome"
@@ -155,7 +148,15 @@ func checkOS() string {
 	return chrome
 }
 
-func handle(err error) error {
+func Header() error {
+	gopath := os.Getenv("GOPATH")
+	if gopath == "" {
+		log.Fatal(Red("$GOPATH isn't set up properly..."))
+	}
+	return nil
+}
+
+func HandleErr(err error) error {
 	if err != nil {
 		fmt.Println(Red(err.Error()))
 		return nil
