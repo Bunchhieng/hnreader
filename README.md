@@ -5,7 +5,7 @@ Hacker News Reader
 Open multiple hacker news feed with your favorite browser using command line.
 
 #### Why?
-I tend to read all news on the front page of Hacker News. This allow me to run one command and open every link for me.
+I tend to read all news on the front page of Hacker News. This allow me to run one command and make life easy.
 
 #### Installation and Usage
 * Run this for get/install it:  
