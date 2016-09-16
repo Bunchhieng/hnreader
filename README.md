@@ -4,7 +4,7 @@ Hacker News Reader
 Open multiple hacker news feed with your favorite browser using command line.
 
 #### Why?
-Tired of clicking each link and for the sake of learning Golang. I read hacker news every morning, each every one of the link in the front page.
+I tend to read all news on the front page of Hacker News. This allow me to run one command and open every link for me.
 
 #### Installation and Usage
 * Run this for get/install it:  
@@ -18,7 +18,7 @@ Tired of clicking each link and for the sake of learning Golang. I read hacker n
   * Run with default option to open 10 news with chrome:   
       `hnreader run`                
   * Run with option `-t = tabs` and `-b = browser`:     
-      `hnreader run -t 7 -b "firefox"`
+      `hnreader run -t 31 -b "firefox"`
 
 #### Credits
 * [urfave/cli](https://github.com/urfave/cli)
