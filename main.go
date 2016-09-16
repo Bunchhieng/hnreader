@@ -44,6 +44,7 @@ func Init() *App {
 	}
 }
 
+// App information
 func (app *App) Information() {
 	fmt.Println(Blue(app.Name) + " - " + Blue(app.Version))
 	fmt.Println(Blue(app.Description) + "\n")
@@ -53,9 +54,10 @@ func (writer logWriter) Write(bytes []byte) (int, error) {
 	return fmt.Print(Yellow("[") + time.Now().UTC().Format("15:04:05") + Yellow("]") + string(bytes))
 }
 
+// Open a browser with input tabs count
 func RunApp(tabs int, browser string) error {
 	news, err := GetStories(tabs)
-	HandleErr(err)
+	handleErr(err)
 	// To store the keys in slice in sorted order
 	var keys []int
 	for k := range news {
@@ -84,7 +86,7 @@ func GetStories(count int) (map[int]string, error) {
 	pages := count / 30
 	for i := 0; i <= pages; i++ {
 		doc, err := goquery.NewDocument(HACKER_NEWS + strconv.Itoa(pages))
-		HandleErr(err)
+		handleErr(err)
 		doc.Find("a.storylink").Each(func(i int, s *goquery.Selection) {
 			href, exist := s.Attr("href")
 			if !exist {
@@ -97,7 +99,7 @@ func GetStories(count int) (map[int]string, error) {
 	return news, nil
 }
 
-func CheckOS() string {
+func checkOS() string {
 	chrome := ""
 	if runtime.GOOS == "windows" {
 		chrome = "chrome"
@@ -107,7 +109,7 @@ func CheckOS() string {
 	return chrome
 }
 
-func Header() error {
+func header() error {
 	gopath := os.Getenv("GOPATH")
 	if gopath == "" {
 		log.Fatal(Red("$GOPATH isn't set up properly..."))
@@ -115,7 +117,7 @@ func Header() error {
 	return nil
 }
 
-func HandleErr(err error) error {
+func handleErr(err error) error {
 	if err != nil {
 		fmt.Println(Red(err.Error()))
 	}
@@ -147,14 +149,14 @@ func main() {
 				Usage:   "Start hnreader with default option (10 news and chrome browser)",
 				Flags: []cli.Flag{
 					&cli.UintFlag{Name: "tabs", Value: 10, Aliases: []string{"t"}, Usage: "Specify value of tabs \t"},
-					&cli.StringFlag{Name: "browser", Value: CheckOS(), Aliases: []string{"b"}, Usage: "Specify broswer \t"},
+					&cli.StringFlag{Name: "browser", Value: checkOS(), Aliases: []string{"b"}, Usage: "Specify broswer \t"},
 				},
 				Action: func(c *cli.Context) error {
-					return HandleErr(RunApp(int(c.Int("tabs")), string(c.String("browser"))))
+					return handleErr(RunApp(int(c.Int("tabs")), string(c.String("browser"))))
 				},
 				Before: func(c *cli.Context) error {
 					app.Information()
-					Header()
+					header()
 					return nil
 				},
 			},
