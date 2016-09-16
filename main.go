@@ -9,10 +9,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/fatih/color"
-	"gopkg.in/urfave/cli.v2"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/fatih/color"
 	"github.com/skratchdot/open-golang/open"
+	"gopkg.in/urfave/cli.v2"
 )
 
 const (
@@ -21,7 +21,7 @@ const (
 	AppAuthor      = "Bunchhieng Soth"
 	AppEmail       = "Bunchhieng@gmail.com"
 	AppDescription = "Open multiple hacker news in your favorite browser with command line."
-	HACKER_NEWS		 = "https://news.ycombinator.com/news?p="
+	HACKER_NEWS    = "https://news.ycombinator.com/news?p="
 )
 
 var Blue = color.New(color.FgBlue, color.Bold).SprintFunc()

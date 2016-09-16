@@ -1,11 +1,11 @@
 package main
 
 import (
-  "log"
-  "reflect"
-  "testing"
+	"log"
+	"reflect"
+	"testing"
 
-  "github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestInit(t *testing.T) {
@@ -17,13 +17,13 @@ func TestInit(t *testing.T) {
 }
 
 func TestGetStories(t *testing.T) {
-  news := make(map[int]string)
-  news, err := GetStories(10)
-  assert.Nil(t, err)
-  if err != nil {
-    log.Fatal(err)
-  }
+	news := make(map[int]string)
+	news, err := GetStories(10)
+	assert.Nil(t, err)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-  assert.NotNil(t, news)
-  assert.Equal(t, 30, len(news), "They should be equal")
+	assert.NotNil(t, news)
+	assert.Equal(t, 30, len(news), "They should be equal")
 }
