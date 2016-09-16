@@ -18,7 +18,7 @@ func TestInit(t *testing.T) {
 
 func TestGetStories(t *testing.T) {
   news := make(map[int]string)
-  news, err := getStories(10)
+  news, err := GetStories(10)
   assert.Nil(t, err)
   if err != nil {
     log.Fatal(err)
