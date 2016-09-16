@@ -1,5 +1,6 @@
 Hacker News Reader
 =========
+[![Go Report Card](https://goreportcard.com/badge/github.com/Bunchhieng/hnreader)](https://goreportcard.com/report/github.com/Bunchhieng/hnreader)  [![Build Status](https://travis-ci.org/Bunchhieng/hnreader.svg?branch=master)](https://travis-ci.org/Bunchhieng/hnreader)
 
 Open multiple hacker news feed with your favorite browser using command line.
 
