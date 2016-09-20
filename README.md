@@ -17,9 +17,9 @@ I tend to read all news on the front page of Hacker News. This allow me to run o
 
 * From the root of a project:
   * Run with default option to open 10 news with chrome:   
-      `hnreader run`                
+      `hnreader r`                
   * Run with option `-t = tabs` and `-b = browser`:     
-      `hnreader run -t 31 -b "firefox"`
+      `hnreader r -t 31 -b "firefox"`
 
 #### Credits
 * [urfave/cli](https://github.com/urfave/cli)
