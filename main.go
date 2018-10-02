@@ -22,7 +22,7 @@ const (
 	AppAuthor      = "Bunchhieng Soth"
 	AppEmail       = "Bunchhieng@gmail.com"
 	AppDescription = "Open multiple hacker news in your favorite browser with command line."
-	hackerNews     = "https://news.ycombinator.com/news?p="
+	HackerNews     = "https://news.ycombinator.com/news?p="
 )
 
 // Colors for console output
@@ -89,7 +89,7 @@ func GetStories(count int) (map[int]string, error) {
 	// 30 news per page
 	pages := count / 30
 	for i := 0; i <= pages; i++ {
-		doc, err := goquery.NewDocument(hackerNews + strconv.Itoa(pages))
+		doc, err := goquery.NewDocument(HackerNews + strconv.Itoa(pages))
 		handleError(err)
 		doc.Find("a.storylink").Each(func(i int, s *goquery.Selection) {
 			href, exist := s.Attr("href")
