@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"runtime"
 	"sort"
@@ -89,7 +90,9 @@ func GetStories(count int) (map[int]string, error) {
 	// 30 news per page
 	pages := count / 30
 	for i := 0; i <= pages; i++ {
-		doc, err := goquery.NewDocument(HackerNews + strconv.Itoa(pages))
+		resp, err := http.Get(HackerNews + strconv.Itoa(pages))
+		handleError(err)
+		doc, err := goquery.NewDocumentFromReader(resp.Body)
 		handleError(err)
 		doc.Find("a.storylink").Each(func(i int, s *goquery.Selection) {
 			href, exist := s.Attr("href")
