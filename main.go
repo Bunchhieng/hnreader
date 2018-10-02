@@ -15,25 +15,29 @@ import (
 	"gopkg.in/urfave/cli.v2"
 )
 
+// App information and constants
 const (
 	AppName        = "hnreader"
 	AppVersion     = "v1.0"
 	AppAuthor      = "Bunchhieng Soth"
 	AppEmail       = "Bunchhieng@gmail.com"
 	AppDescription = "Open multiple hacker news in your favorite browser with command line."
-	HACKER_NEWS    = "https://news.ycombinator.com/news?p="
+	hackerNews     = "https://news.ycombinator.com/news?p="
 )
 
-var Blue = color.New(color.FgBlue, color.Bold).SprintFunc()
-var Yellow = color.New(color.FgYellow, color.Bold).SprintFunc()
-var Red = color.New(color.FgRed, color.Bold).SprintFunc()
+// Colors for console output
+var blue = color.New(color.FgBlue, color.Bold).SprintFunc()
+var yellow = color.New(color.FgYellow, color.Bold).SprintFunc()
+var red = color.New(color.FgRed, color.Bold).SprintFunc()
 
 type logWriter struct{}
 
+// App contains author information
 type App struct {
 	Name, Version, Email, Description, Author string
 }
 
+// Init initalizes the app
 func Init() *App {
 	return &App{
 		Name:        AppName,
@@ -44,20 +48,20 @@ func Init() *App {
 	}
 }
 
-// App information
+// Information prints out app information
 func (app *App) Information() {
-	fmt.Println(Blue(app.Name) + " - " + Blue(app.Version))
-	fmt.Println(Blue(app.Description) + "\n")
+	fmt.Println(blue(app.Name) + " - " + blue(app.Version))
+	fmt.Println(blue(app.Description) + "\n")
 }
 
 func (writer logWriter) Write(bytes []byte) (int, error) {
-	return fmt.Print(Yellow("[") + time.Now().UTC().Format("15:04:05") + Yellow("]") + string(bytes))
+	return fmt.Print(yellow("[") + time.Now().UTC().Format("15:04:05") + yellow("]") + string(bytes))
 }
 
-// Open a browser with input tabs count
+//RunApp opens a browser with input tabs count
 func RunApp(tabs int, browser string) error {
 	news, err := GetStories(tabs)
-	handleErr(err)
+	handleError(err)
 	// To store the keys in slice in sorted order
 	var keys []int
 	for k := range news {
@@ -72,25 +76,25 @@ func RunApp(tabs int, browser string) error {
 		}
 		err := open.RunWith(news[k], browser)
 		if err != nil {
-			fmt.Printf(Red("%s is not found on this computer...\n"), browser)
+			fmt.Printf(red("%s is not found on this computer...\n"), browser)
 			os.Exit(1)
 		}
 	}
 	return nil
 }
 
-// Get list of stories based on number of input
+// GetStories gets list of stories based on number of input
 func GetStories(count int) (map[int]string, error) {
 	news := make(map[int]string)
 	// 30 news per page
 	pages := count / 30
 	for i := 0; i <= pages; i++ {
-		doc, err := goquery.NewDocument(HACKER_NEWS + strconv.Itoa(pages))
-		handleErr(err)
+		doc, err := goquery.NewDocument(hackerNews + strconv.Itoa(pages))
+		handleError(err)
 		doc.Find("a.storylink").Each(func(i int, s *goquery.Selection) {
 			href, exist := s.Attr("href")
 			if !exist {
-				fmt.Println(Red("can't find any stories..."))
+				fmt.Println(red("can't find any stories..."))
 			}
 			news[i] = href
 		})
@@ -99,7 +103,8 @@ func GetStories(count int) (map[int]string, error) {
 	return news, nil
 }
 
-func checkOS() string {
+// checkOSForChrome gets chrome name correspond to OS
+func checkOSForChrome() string {
 	chrome := ""
 	if runtime.GOOS == "windows" {
 		chrome = "chrome"
@@ -109,17 +114,19 @@ func checkOS() string {
 	return chrome
 }
 
-func header() error {
+// checkGoPath checks for GOPATH
+func checkGoPath() error {
 	gopath := os.Getenv("GOPATH")
 	if gopath == "" {
-		log.Fatal(Red("$GOPATH isn't set up properly..."))
+		log.Fatal(red("$GOPATH isn't set up properly..."))
 	}
 	return nil
 }
 
-func handleErr(err error) error {
+// handleError go convention
+func handleError(err error) error {
 	if err != nil {
-		fmt.Println(Red(err.Error()))
+		fmt.Println(red(err.Error()))
 	}
 	return nil
 }
@@ -149,14 +156,14 @@ func main() {
 				Usage:   "Start hnreader with default option (10 news and chrome browser)",
 				Flags: []cli.Flag{
 					&cli.UintFlag{Name: "tabs", Value: 10, Aliases: []string{"t"}, Usage: "Specify value of tabs \t"},
-					&cli.StringFlag{Name: "browser", Value: checkOS(), Aliases: []string{"b"}, Usage: "Specify broswer \t"},
+					&cli.StringFlag{Name: "browser", Value: checkOSForChrome(), Aliases: []string{"b"}, Usage: "Specify broswer \t"},
 				},
 				Action: func(c *cli.Context) error {
-					return handleErr(RunApp(int(c.Int("tabs")), string(c.String("browser"))))
+					return handleError(RunApp(int(c.Int("tabs")), string(c.String("browser"))))
 				},
 				Before: func(c *cli.Context) error {
 					app.Information()
-					header()
+					checkGoPath()
 					return nil
 				},
 			},
