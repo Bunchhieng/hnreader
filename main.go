@@ -112,10 +112,8 @@ func GetStories(count int) (map[int]string, error) {
 
 // checkOSForChrome gets chrome name correspond to OS
 func checkOSForChrome() string {
-	chrome := ""
-	if runtime.GOOS == "windows" {
-		chrome = "chrome"
-	} else if runtime.GOOS == "darwin" {
+	chrome := "chrome"
+	if runtime.GOOS == "darwin" {
 		chrome = "Google Chrome"
 	}
 	return chrome
