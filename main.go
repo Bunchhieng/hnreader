@@ -18,7 +18,7 @@ import (
 // App information and constants
 const (
 	AppName        = "hnreader"
-	AppVersion     = "v1.0"
+	AppVersion     = "v1.1"
 	AppAuthor      = "Bunchhieng Soth"
 	AppEmail       = "Bunchhieng@gmail.com"
 	AppDescription = "Open multiple hacker news in your favorite browser with command line."
