@@ -16,9 +16,8 @@ func TestInit(t *testing.T) {
 	}
 }
 
-func TestGetStories(t *testing.T) {
-	news := make(map[int]string)
-	news, err := GetStories(10)
+func TestGetHNStories(t *testing.T) {
+	news, err := new(HackerNewsSource).Fetch(10)
 	assert.Nil(t, err)
 	if err != nil {
 		log.Fatal(err)
@@ -26,4 +25,15 @@ func TestGetStories(t *testing.T) {
 
 	assert.NotNil(t, news)
 	assert.Equal(t, 30, len(news), "They should be equal")
+}
+
+func TestGetRedditStories(t *testing.T) {
+	news, err := new(RedditSource).Fetch(10)
+	assert.Nil(t, err)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	assert.NotNil(t, news)
+	assert.Equal(t, 10, len(news), "They should be equal")
 }
