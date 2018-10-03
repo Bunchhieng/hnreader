@@ -1,16 +1,10 @@
 language: go
 sudo: false
 go:
-  - 1.6.2
+  - 1.11
 os:
   - linux
   - osx
   - windows
-install:
-  - go get github.com/fatih/color
-  - go get gopkg.in/urfave/cli.v2
-  - go get github.com/PuerkitoBio/goquery
-  - go get github.com/skratchdot/open-golang/open
-  - go get github.com/stretchr/testify/assert
 script:
   - go test -v ./...
