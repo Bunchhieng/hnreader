@@ -17,7 +17,7 @@ I tend to read all news on the front page of Hacker News. This allow me to run o
 
 - Install golang:
   - `brew install go` on Mac
-  - Or download the binary from ![here](https://golang.org/dl/)
+  - Or download the binary from [here](https://golang.org/dl/)
 - Make sure you have GOPATH set up properly:  
   `export GOPATH=/path/to/your/go/workspace`  
   `export PATH=$GOPATH/bin:$PATH`
