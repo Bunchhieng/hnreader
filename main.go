@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"runtime"
 	"sort"
@@ -74,10 +75,14 @@ func RunApp(tabs int, browser string) error {
 		if k == tabs {
 			break
 		}
+
 		err := open.RunWith(news[k], browser)
 		if err != nil {
-			fmt.Printf(red("%s is not found on this computer...\n"), browser)
-			os.Exit(1)
+			fmt.Printf(red("%s is not found on this computer, trying default browser...\n"), browser)
+			err = open.Run(news[k])
+			if err != nil {
+				os.Exit(1)
+			}
 		}
 	}
 	return nil
@@ -89,7 +94,9 @@ func GetStories(count int) (map[int]string, error) {
 	// 30 news per page
 	pages := count / 30
 	for i := 0; i <= pages; i++ {
-		doc, err := goquery.NewDocument(HackerNews + strconv.Itoa(pages))
+		resp, err := http.Get(HackerNews + strconv.Itoa(pages))
+		handleError(err)
+		doc, err := goquery.NewDocumentFromReader(resp.Body)
 		handleError(err)
 		doc.Find("a.storylink").Each(func(i int, s *goquery.Selection) {
 			href, exist := s.Attr("href")
@@ -105,10 +112,8 @@ func GetStories(count int) (map[int]string, error) {
 
 // checkOSForChrome gets chrome name correspond to OS
 func checkOSForChrome() string {
-	chrome := ""
-	if runtime.GOOS == "windows" {
-		chrome = "chrome"
-	} else if runtime.GOOS == "darwin" {
+	chrome := "chrome"
+	if runtime.GOOS == "darwin" {
 		chrome = "Google Chrome"
 	}
 	return chrome
