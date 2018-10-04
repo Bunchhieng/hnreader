@@ -37,3 +37,13 @@ func TestGetRedditStories(t *testing.T) {
 	assert.NotNil(t, news)
 	assert.Equal(t, 10, len(news), "They should be equal")
 }
+
+func TestGetLobstersStories(t *testing.T) {
+	news, err := new(LobstersSource).Fetch(10)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	assert.NotNil(t, news)
+	assert.Equal(t, 10, len(news), "They should be equal")
+}
