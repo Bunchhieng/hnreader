@@ -3,11 +3,13 @@ package main
 import (
 	"fmt"
 	"log"
+	"math"
 	"net/http"
 	"os"
 	"runtime"
 	"sort"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
@@ -25,6 +27,7 @@ const (
 	AppEmail       = "Bunchhieng@gmail.com"
 	AppDescription = "Open multiple hacker news in your favorite browser with command line."
 	HackerNewsURL  = "https://news.ycombinator.com/news?p="
+	LobstersURL    = "https://lobste.rs"
 )
 
 // Colors for console output
@@ -91,6 +94,48 @@ func (rs *RedditSource) Fetch(count int) (map[int]string, error) {
 	return news, nil
 }
 
+// LobstersSource fetches new stories from https://lobste.rs
+type LobstersSource struct{}
+
+func (l *LobstersSource) Fetch(count int) (map[int]string, error) {
+	offset := float64(count) / float64(25)
+	pages := int(math.Ceil(offset))
+	news := make(map[int]string)
+	newsIndex := 0
+
+	for p := 1; p <= pages; p++ {
+		url := fmt.Sprintf("%s/page/%d", LobstersURL, p)
+		resp, err := http.Get(url)
+		handleError(err)
+
+		doc, err := goquery.NewDocumentFromReader(resp.Body)
+		handleError(err)
+
+		doc.Find(".link a.u-url").Each(func(_ int, s *goquery.Selection) {
+			href, exist := s.Attr("href")
+			if !exist {
+				fmt.Println(red("can't find any stories..."))
+			}
+
+			if newsIndex >= count {
+				return
+			}
+
+			// if internal link
+			if strings.HasPrefix(href, "/") {
+				href = LobstersURL + href
+			}
+
+			news[newsIndex] = href
+			newsIndex++
+		})
+
+		resp.Body.Close()
+	}
+
+	return news, nil
+}
+
 // Init initalizes the app
 func Init() *App {
 	return &App{
@@ -134,7 +179,7 @@ func RunApp(tabs int, browser string, src Fetcher) error {
 			fmt.Printf(red("%s is not found on this computer, trying default browser...\n"), browser)
 			err = open.Run(news[k])
 			if err != nil {
-				os.Exit(1)
+				fmt.Print(yellow(fmt.Sprintf("Can't open link %s\n", news[k])))
 			}
 		}
 	}
@@ -207,7 +252,7 @@ func main() {
 						Name:    "source",
 						Value:   "hn",
 						Aliases: []string{"s"},
-						Usage:   "Specify news source (one of \"hn\", \"reddit\")\t",
+						Usage:   "Specify news source (one of \"hn\", \"reddit\", \"lobsters\")\t",
 					},
 				},
 				Action: func(c *cli.Context) error {
@@ -218,6 +263,8 @@ func main() {
 						src = new(HackerNewsSource)
 					case "reddit":
 						src = new(RedditSource)
+					case "lobsters":
+						src = new(LobstersSource)
 					default:
 						return handleError(fmt.Errorf("invalid source: %s", c.String("source")))
 					}
