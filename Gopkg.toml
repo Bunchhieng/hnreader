@@ -44,3 +44,7 @@
 [[constraint]]
   branch = "master"
   name = "github.com/jzelinskie/geddit"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/texttheater/golang-levenshtein"

@@ -14,6 +14,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/jzelinskie/geddit"
 	"github.com/skratchdot/open-golang/open"
+	"github.com/texttheater/golang-levenshtein/levenshtein"
 	"gopkg.in/urfave/cli.v2"
 )
 
@@ -116,6 +117,9 @@ func (writer logWriter) Write(bytes []byte) (int, error) {
 func RunApp(tabs int, browser string, src Fetcher) error {
 	news, err := src.Fetch(tabs)
 	handleError(err)
+
+	browser = findBrowser(browser)
+
 	// To store the keys in slice in sorted order
 	var keys []int
 	for k := range news {
@@ -129,25 +133,68 @@ func RunApp(tabs int, browser string, src Fetcher) error {
 			break
 		}
 
-		err := open.RunWith(news[k], browser)
-		if err != nil {
-			fmt.Printf(red("%s is not found on this computer, trying default browser...\n"), browser)
+		var err error
+		if browser == "" {
+			fmt.Println(red("Trying default browser..."))
 			err = open.Run(news[k])
+		} else {
+			err = open.RunWith(news[k], browser)
 			if err != nil {
-				os.Exit(1)
+				fmt.Printf(red("%s is not found on this computer, trying default browser...\n"), browser)
+				err = open.Run(news[k])
 			}
+		}
+
+		if err != nil {
+			os.Exit(1)
 		}
 	}
 	return nil
 }
 
-// checkOSForChrome gets chrome name correspond to OS
-func checkOSForChrome() string {
-	chrome := "chrome"
-	if runtime.GOOS == "darwin" {
-		chrome = "Google Chrome"
+func findBrowser(target string) string {
+	if target == "" {
+		return ""
 	}
-	return chrome
+	browsers := []string{"google", "chrome", "mozilla", "firefox", "brave"}
+	shortest := -1
+	word := ""
+	for _, browser := range browsers {
+		distance := levenshtein.DistanceForStrings([]rune(browser), []rune(target), levenshtein.DefaultOptions)
+		if distance == 0 {
+			word = browser
+			break
+		}
+		if distance <= shortest || shortest < 0 {
+			shortest = distance
+			word = browser
+		}
+	}
+
+	return getBrowserNameByOS(word)
+}
+
+func getBrowserNameByOS(k string) string {
+	browser := ""
+	switch k {
+	case "google", "chrome":
+		switch runtime.GOOS {
+		case "darwin":
+			browser = "Google Chrome"
+		}
+	case "mozilla", "firefox":
+		switch runtime.GOOS {
+		case "darwin":
+			browser = "Firefox"
+		}
+	case "brave":
+		switch runtime.GOOS {
+		case "darwin":
+			browser = "Brave"
+		}
+	}
+
+	return browser
 }
 
 // checkGoPath checks for GOPATH
@@ -199,7 +246,7 @@ func main() {
 					},
 					&cli.StringFlag{
 						Name:    "browser",
-						Value:   checkOSForChrome(),
+						Value:   "",
 						Aliases: []string{"b"},
 						Usage:   "Specify broswer\t",
 					},
