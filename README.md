@@ -4,11 +4,11 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/ba5c7736f364c04b562c/maintainability)](https://codeclimate.com/github/Bunchhieng/hnreader/maintainability)
 ![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)
 
-Open multiple hacker news feed with your favorite browser using command line.
+Open multiple news feed with your favorite browser using command line.
 
 #### Why?
 
-I tend to read all news on the front page of Hacker News. This allow me to run one command and make life easy.
+Stay up to update with new technology and waste all your morning reading everything on front page of popular programming sites.
 
 #### Installation and Usage
 
@@ -25,8 +25,10 @@ I tend to read all news on the front page of Hacker News. This allow me to run o
 - From the root of a project:
   - Run with default option to open 10 news with chrome:  
      `hnreader r`
-  - Run with option `-t = tabs` and `-b = browser`:  
+  - Example on how to run with option `-t = tabs`, `-s = source` and `-b = browser`:  
      `hnreader r -t 31 -b "firefox"`
+    `hnreader r -b "brave" -s "reddit"`
+    `hnreader r -b "firefox" -s "reddit"`
 
 #### Credits
 

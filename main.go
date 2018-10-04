@@ -26,7 +26,7 @@ const (
 	AppVersion     = "v1.1"
 	AppAuthor      = "Bunchhieng Soth"
 	AppEmail       = "Bunchhieng@gmail.com"
-	AppDescription = "Open multiple hacker news in your favorite browser with command line."
+	AppDescription = "Open multiple news feed in your favorite browser with command line."
 	HackerNewsURL  = "https://news.ycombinator.com/news?p="
 	LobstersURL    = "https://lobste.rs"
 )
@@ -51,6 +51,7 @@ type Fetcher interface {
 // HackerNewsSource fetches new stories from news.ycombinator.com.
 type HackerNewsSource struct{}
 
+// Fetch gets news from the HackerNews
 func (hn *HackerNewsSource) Fetch(count int) (map[int]string, error) {
 	news := make(map[int]string)
 	// 30 news per page
@@ -75,6 +76,7 @@ func (hn *HackerNewsSource) Fetch(count int) (map[int]string, error) {
 // RedditSource fetches new stories from reddit.com/r/programming.
 type RedditSource struct{}
 
+// Fetch gets news from the Reddit
 func (rs *RedditSource) Fetch(count int) (map[int]string, error) {
 	news := make(map[int]string)
 
@@ -98,6 +100,7 @@ func (rs *RedditSource) Fetch(count int) (map[int]string, error) {
 // LobstersSource fetches new stories from https://lobste.rs
 type LobstersSource struct{}
 
+// Fetch gets news from the Lobsters
 func (l *LobstersSource) Fetch(count int) (map[int]string, error) {
 	offset := float64(count) / float64(25)
 	pages := int(math.Ceil(offset))
@@ -219,6 +222,7 @@ func findBrowser(target string) string {
 	return getBrowserNameByOS(word)
 }
 
+// getBrowserNameByOS normilizes browser name
 func getBrowserNameByOS(k string) string {
 	browser := ""
 	switch k {
