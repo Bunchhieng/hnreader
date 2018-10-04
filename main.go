@@ -12,6 +12,7 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/fatih/color"
+	"github.com/jzelinskie/geddit"
 	"github.com/skratchdot/open-golang/open"
 	"gopkg.in/urfave/cli.v2"
 )
@@ -23,7 +24,7 @@ const (
 	AppAuthor      = "Bunchhieng Soth"
 	AppEmail       = "Bunchhieng@gmail.com"
 	AppDescription = "Open multiple hacker news in your favorite browser with command line."
-	HackerNews     = "https://news.ycombinator.com/news?p="
+	HackerNewsURL  = "https://news.ycombinator.com/news?p="
 )
 
 // Colors for console output
@@ -36,6 +37,58 @@ type logWriter struct{}
 // App contains author information
 type App struct {
 	Name, Version, Email, Description, Author string
+}
+
+// Fetcher retrieves stories from a source.
+type Fetcher interface {
+	Fetch(count int) (map[int]string, error)
+}
+
+// HackerNewsSource fetches new stories from news.ycombinator.com.
+type HackerNewsSource struct{}
+
+func (hn *HackerNewsSource) Fetch(count int) (map[int]string, error) {
+	news := make(map[int]string)
+	// 30 news per page
+	pages := count / 30
+	for i := 0; i <= pages; i++ {
+		resp, err := http.Get(HackerNewsURL + strconv.Itoa(pages))
+		handleError(err)
+		doc, err := goquery.NewDocumentFromReader(resp.Body)
+		handleError(err)
+		doc.Find("a.storylink").Each(func(i int, s *goquery.Selection) {
+			href, exist := s.Attr("href")
+			if !exist {
+				fmt.Println(red("can't find any stories..."))
+			}
+			news[i] = href
+		})
+	}
+
+	return news, nil
+}
+
+// RedditSource fetches new stories from reddit.com/r/programming.
+type RedditSource struct{}
+
+func (rs *RedditSource) Fetch(count int) (map[int]string, error) {
+	news := make(map[int]string)
+
+	s := geddit.NewSession(fmt.Sprintf("desktop:com.github.Bunchhieng.%s:%s", AppName, AppVersion))
+	subs, err := s.SubredditSubmissions(
+		"programming",
+		geddit.HotSubmissions,
+		geddit.ListingOptions{
+			Count: count,
+			Limit: count,
+		},
+	)
+	handleError(err)
+
+	for i, sub := range subs {
+		news[i] = sub.URL
+	}
+	return news, nil
 }
 
 // Init initalizes the app
@@ -60,8 +113,8 @@ func (writer logWriter) Write(bytes []byte) (int, error) {
 }
 
 //RunApp opens a browser with input tabs count
-func RunApp(tabs int, browser string) error {
-	news, err := GetStories(tabs)
+func RunApp(tabs int, browser string, src Fetcher) error {
+	news, err := src.Fetch(tabs)
 	handleError(err)
 	// To store the keys in slice in sorted order
 	var keys []int
@@ -86,28 +139,6 @@ func RunApp(tabs int, browser string) error {
 		}
 	}
 	return nil
-}
-
-// GetStories gets list of stories based on number of input
-func GetStories(count int) (map[int]string, error) {
-	news := make(map[int]string)
-	// 30 news per page
-	pages := count / 30
-	for i := 0; i <= pages; i++ {
-		resp, err := http.Get(HackerNews + strconv.Itoa(pages))
-		handleError(err)
-		doc, err := goquery.NewDocumentFromReader(resp.Body)
-		handleError(err)
-		doc.Find("a.storylink").Each(func(i int, s *goquery.Selection) {
-			href, exist := s.Attr("href")
-			if !exist {
-				fmt.Println(red("can't find any stories..."))
-			}
-			news[i] = href
-		})
-	}
-
-	return news, nil
 }
 
 // checkOSForChrome gets chrome name correspond to OS
@@ -160,11 +191,38 @@ func main() {
 				Aliases: []string{"r"},
 				Usage:   "Start hnreader with default option (10 news and chrome browser)",
 				Flags: []cli.Flag{
-					&cli.UintFlag{Name: "tabs", Value: 10, Aliases: []string{"t"}, Usage: "Specify value of tabs \t"},
-					&cli.StringFlag{Name: "browser", Value: checkOSForChrome(), Aliases: []string{"b"}, Usage: "Specify broswer \t"},
+					&cli.UintFlag{
+						Name:    "tabs",
+						Value:   10,
+						Aliases: []string{"t"},
+						Usage:   "Specify value of tabs\t",
+					},
+					&cli.StringFlag{
+						Name:    "browser",
+						Value:   checkOSForChrome(),
+						Aliases: []string{"b"},
+						Usage:   "Specify broswer\t",
+					},
+					&cli.StringFlag{
+						Name:    "source",
+						Value:   "hn",
+						Aliases: []string{"s"},
+						Usage:   "Specify news source (one of \"hn\", \"reddit\")\t",
+					},
 				},
 				Action: func(c *cli.Context) error {
-					return handleError(RunApp(int(c.Int("tabs")), string(c.String("browser"))))
+					var src Fetcher
+
+					switch c.String("source") {
+					case "hn":
+						src = new(HackerNewsSource)
+					case "reddit":
+						src = new(RedditSource)
+					default:
+						return handleError(fmt.Errorf("invalid source: %s", c.String("source")))
+					}
+
+					return handleError(RunApp(c.Int("tabs"), c.String("browser"), src))
 				},
 				Before: func(c *cli.Context) error {
 					app.Information()
