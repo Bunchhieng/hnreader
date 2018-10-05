@@ -32,9 +32,11 @@ const (
 )
 
 // Colors for console output
-var blue = color.New(color.FgBlue, color.Bold).SprintFunc()
-var yellow = color.New(color.FgYellow, color.Bold).SprintFunc()
-var red = color.New(color.FgRed, color.Bold).SprintFunc()
+var (
+	blue   = color.New(color.FgBlue, color.Bold).SprintFunc()
+	yellow = color.New(color.FgYellow, color.Bold).SprintFunc()
+	red    = color.New(color.FgRed, color.Bold).SprintFunc()
+)
 
 type logWriter struct{}
 
@@ -223,27 +225,26 @@ func findBrowser(target string) string {
 }
 
 // getBrowserNameByOS normilizes browser name
-func getBrowserNameByOS(k string) string {
-	browser := ""
-	switch k {
-	case "google", "chrome":
-		switch runtime.GOOS {
-		case "darwin":
-			browser = "Google Chrome"
-		}
-	case "mozilla", "firefox":
-		switch runtime.GOOS {
-		case "darwin":
-			browser = "Firefox"
-		}
-	case "brave":
-		switch runtime.GOOS {
-		case "darwin":
-			browser = "Brave"
+func getBrowserNameByOS(denormalizedStr string) string {
+	os := runtime.GOOS
+
+	// key = denormalized value, value = normalized value
+	browserNameMap := map[string]string{
+		"google":  "Google Chrome",
+		"chrome":  "Google Chrome",
+		"mozilla": "Firefox",
+		"firefox": "Firefox",
+		"brave":   "Brave",
+	}
+
+	if os == "darwin" {
+		normalizedStr, ok := browserNameMap[denormalizedStr]
+		if ok {
+			return normalizedStr
 		}
 	}
 
-	return browser
+	return ""
 }
 
 // checkGoPath checks for GOPATH
