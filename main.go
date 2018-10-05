@@ -70,9 +70,17 @@ func (hn *HackerNewsSource) Fetch(count int) (map[int]string, error) {
 	pages := count / 30
 	for i := 0; i <= pages; i++ {
 		resp, err := http.Get(HackerNewsURL + strconv.Itoa(pages))
-		handleError(err)
+		if err != nil {
+			handleError(err)
+			continue
+		}
+
 		doc, err := goquery.NewDocumentFromReader(resp.Body)
-		handleError(err)
+		if err != nil {
+			handleError(err)
+			continue
+		}
+
 		doc.Find("a.storylink").Each(func(i int, s *goquery.Selection) {
 			href, exist := s.Attr("href")
 			if !exist {
@@ -80,6 +88,8 @@ func (hn *HackerNewsSource) Fetch(count int) (map[int]string, error) {
 			}
 			news[i] = href
 		})
+
+		resp.Body.Close()
 	}
 
 	return news, nil
@@ -101,11 +111,15 @@ func (rs *RedditSource) Fetch(count int) (map[int]string, error) {
 			Limit: count,
 		},
 	)
-	handleError(err)
+
+	if err != nil {
+		return news, err
+	}
 
 	for i, sub := range subs {
 		news[i] = sub.URL
 	}
+
 	return news, nil
 }
 
@@ -122,10 +136,16 @@ func (l *LobstersSource) Fetch(count int) (map[int]string, error) {
 	for p := 1; p <= pages; p++ {
 		url := fmt.Sprintf("%s/page/%d", LobstersURL, p)
 		resp, err := http.Get(url)
-		handleError(err)
+		if err != nil {
+			handleError(err)
+			continue
+		}
 
 		doc, err := goquery.NewDocumentFromReader(resp.Body)
-		handleError(err)
+		if err != nil {
+			handleError(err)
+			continue
+		}
 
 		doc.Find(".link a.u-url").Each(func(_ int, s *goquery.Selection) {
 			href, exist := s.Attr("href")
@@ -160,15 +180,16 @@ func (l *DZoneSource) Fetch(count int) (map[int]string, error) {
 	news := make(map[int]string)
 
 	resp, err := http.Get(DZoneURL)
-	defer resp.Body.Close()
+	if err != nil {
+		return news, err
+	}
 
-	handleError(err)
+	defer resp.Body.Close()
 
 	doc := Rss{}
 	d := xml.NewDecoder(resp.Body)
 
 	if err := d.Decode(&doc); err != nil {
-		handleError(err)
 		return news, err
 	}
 
