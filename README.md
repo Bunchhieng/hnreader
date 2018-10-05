@@ -36,6 +36,7 @@ Stay up to update with new technology and waste all your morning reading everyth
 - [Fatih Arslan](https://github.com/fatih/color)
 - [Martin Angers](https://github.com/PuerkitoBio/goquery)
 - [skratchdot](https://github.com/skratchdot/open-golang)
+- [Corey Prak](https://www.instagram.com/prakattak/)
 
 #### License
 
