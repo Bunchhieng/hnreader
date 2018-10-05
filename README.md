@@ -23,12 +23,15 @@ Stay up to update with new technology and waste all your morning reading everyth
   `export PATH=$GOPATH/bin:$PATH`
 
 - From the root of a project:
+
   - Run with default option to open 10 news with chrome:  
      `hnreader r`
-  - Example on how to run with option `-t = tabs`, `-s = source` and `-b = browser`:  
-     `hnreader r -t 31 -b "firefox"`
-    `hnreader r -b "brave" -s "reddit"`
-    `hnreader r -b "firefox" -s "reddit"`
+  - Example on how to run with option `-t = tabs`, `-s = source` and `-b = browser`:
+    - `hnreader r -t 31 -b "firefox"`
+    - `hnreader r -b "brave" -s "reddit"`
+    - `hnreader r -b "firefox" -s "reddit" -t 20`
+  - bash alias is your friend if you're going to run the same command every morning
+    - `alias hnr='hnreader r -b "firefox" -s "reddit" -t 30'`
 
 #### Credits
 
