@@ -35,7 +35,7 @@ Stay up to update with new technology and waste all your morning reading everyth
 
 #### Want to contribute?
 
-Please see the [CONTRIBUTION.md](CONTRIBUTION.md)
+Please see the [CONTRIBUTING.md](CONTRIBUTING.md)
 
 #### Credits
 
