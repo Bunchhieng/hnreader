@@ -33,6 +33,10 @@ Stay up to update with new technology and waste all your morning reading everyth
   - bash alias is your friend if you're going to run the same command every morning
     - `alias hnr='hnreader r -b "firefox" -s "reddit" -t 30'`
 
+#### Want to contribute?
+
+Please see the [CONTRIBUTION.md](CONTRIBUTION.md)
+
 #### Credits
 
 - [urfave/cli](https://github.com/urfave/cli)
