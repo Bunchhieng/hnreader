@@ -1,39 +1,68 @@
-# Hacker News Reader
+# hnreader
+
+Stay up to date with the latest news in technology from your favourite programming sites, all aggregated into one feed.
+
+hnreader (Hackernews Reader) allows you to open tech news feeds in your favorite browser from the command line.
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/Bunchhieng/hnreader)](https://goreportcard.com/report/github.com/Bunchhieng/hnreader) [![Build Status](https://travis-ci.org/Bunchhieng/hnreader.svg?branch=master)](https://travis-ci.org/Bunchhieng/hnreader)
 [![Maintainability](https://api.codeclimate.com/v1/badges/ba5c7736f364c04b562c/maintainability)](https://codeclimate.com/github/Bunchhieng/hnreader/maintainability)
 ![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)
 
-Open multiple news feed with your favorite browser using command line.
+#### Installation
 
-#### Why?
+- Download the binary from the hndreader [GitHub Release Page](github.com/FrontSide/hnreader/releases)
 
-Stay up to update with new technology and waste all your morning reading everything on front page of popular programming sites.
+  For example: To download and install version 1.1 for linux, you may run the following.
 
-#### Installation and Usage
+  ```
+  $ sudo curl -L https://github.com/FrontSide/hnreader/releases/download/v1.1/hnreader-v1.1.linux.x86_64 > /usr/local/bin/hnreader && chmod +x /usr/local/bin/hnreader
+  ```
 
-- Run this for get/install it:  
-  `go get -u github.com/Bunchhieng/hnreader`
+- **or** install the Go package
 
-- Install golang:
-  - `brew install go` on Mac
-  - Or download the binary from [here](https://golang.org/dl/)
-- Make sure you have GOPATH set up properly:  
-  `export GOPATH=/path/to/your/go/workspace`  
-  `export PATH=$GOPATH/bin:$PATH`
+  ```
+  $ go get -u github.com/Bunchhieng/hnreader
+  ```
 
-- From the root of a project:
+  Note that **this option requires** you to have **golang** already
+  installed. You can install go with your operation system's package manager or download it from [golang.org/dl/](https://golang.org/dl/).
 
-  - Run with default option to open 10 news with chrome:  
-     `hnreader r`
-  - Example on how to run with option `-t = tabs`, `-s = source` and `-b = browser`:
-    - `hnreader r -t 31 -b "firefox"`
-    - `hnreader r -b "brave" -s "reddit"`
-    - `hnreader r -b "firefox" -s "reddit" -t 20`
-  - bash alias is your friend if you're going to run the same command every morning
-    - `alias hnr='hnreader r -b "firefox" -s "reddit" -t 30'`
+  Don't forget to set your GOPATH and PATH environment variables:
 
-#### Want to contribute?
+  ```
+  $ export GOPATH=/path/to/your/go/workspace
+  $ export PATH=$GOPATH/bin:$PATH
+  ```
+
+#### Usage
+
+To use hnreader with its default options (Opens 10 news sites with chrome), simply run:  
+```
+$ hnreader r
+```
+
+There are a number of customization options:
+  ```
+  --tabs value, -t value     Specify value of tabs  (default: 10)
+  --browser value, -b value  Specify browser
+  --source value, -s value   Specify news source (one of "hn", "reddit", "lobsters")   (default: "hn")
+  ```
+
+Examples with options:
+```
+$ hnreader r -t 31 -b "firefox"
+$ hnreader r -b "brave" -s "reddit"
+$ hnreader r -b "firefox" -s "reddit" -t 20
+```
+
+**Tip:** Create a bash alias (for linux and macOS), if you are going to run the same command every morning.
+You can do so by adding the following line (with your preferred options) to the end of your `~/.bashrc` file:
+
+```
+alias hnr='hnreader r -b "firefox" -s "reddit" -t 30' >> ~/.bashrc
+```
+
+#### Contribution
 
 Please see the [CONTRIBUTING.md](CONTRIBUTING.md)
 
