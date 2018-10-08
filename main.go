@@ -31,6 +31,7 @@ const (
 	HackerNewsURL  = "https://news.ycombinator.com/news?p="
 	LobstersURL    = "https://lobste.rs"
 	DZoneURL       = "http://feeds.dzone.com/home"
+	DevToURL       = "https://dev.to/feed"
 )
 
 // Supported operating systems (GOOS)
@@ -187,6 +188,38 @@ func (l *DZoneSource) Fetch(count int) (map[int]string, error) {
 	news := make(map[int]string)
 
 	resp, err := http.Get(DZoneURL)
+	if err != nil {
+		return news, err
+	}
+
+	defer resp.Body.Close()
+
+	doc := Rss{}
+	d := xml.NewDecoder(resp.Body)
+
+	if err := d.Decode(&doc); err != nil {
+		return news, err
+	}
+
+	for i, item := range doc.Item {
+		if i >= count {
+			break
+		}
+
+		news[i] = item.Link
+	}
+
+	return news, nil
+}
+
+// DevToSource fetches latest stories from https://dev.to/
+type DevToSource struct{}
+
+// Fetch gets news from the Dev.To
+func (l *DevToSource) Fetch(count int) (map[int]string, error) {
+	news := make(map[int]string)
+
+	resp, err := http.Get(DevToURL)
 	if err != nil {
 		return news, err
 	}
@@ -399,7 +432,7 @@ func main() {
 						Name:    "source",
 						Value:   "hn",
 						Aliases: []string{"s"},
-						Usage:   "Specify news source (one of \"hn\", \"reddit\", \"lobsters\", \"dzone\")\t",
+						Usage:   "Specify news source (one of \"hn\", \"reddit\", \"lobsters\", \"dzone\", \"devto\")\t",
 					},
 				},
 				Action: func(c *cli.Context) error {
@@ -414,6 +447,8 @@ func main() {
 						src = new(LobstersSource)
 					case "dzone":
 						src = new(DZoneSource)
+					case "devto":
+						src = new(DevToSource)
 					default:
 						return handleError(fmt.Errorf("invalid source: %s", c.String("source")))
 					}
