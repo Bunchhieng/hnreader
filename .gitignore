@@ -28,3 +28,6 @@ _testmain.go
 
 # Executable
 /hnreader
+
+# Workflow tools
+Makefile
