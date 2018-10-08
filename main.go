@@ -288,7 +288,6 @@ func RunApp(tabs int, browser string, src Fetcher) error {
 
 		var err error
 		if browser == "" {
-			fmt.Println(red("Trying default browser..."))
 			err = open.Run(news[k])
 		} else {
 			err = open.RunWith(news[k], browser)
@@ -305,6 +304,7 @@ func RunApp(tabs int, browser string, src Fetcher) error {
 	return nil
 }
 
+// findBrowser
 func findBrowser(target string) string {
 	if target == "" {
 		return ""
@@ -327,6 +327,7 @@ func findBrowser(target string) string {
 	return getBrowserNameByOS(word, runtime.GOOS)
 }
 
+// getGoogleChromeNameForOS
 func getGoogleChromeNameForOS(os string) string {
 	switch os {
 	case OSDarwin:
@@ -339,6 +340,7 @@ func getGoogleChromeNameForOS(os string) string {
 	return ""
 }
 
+// getFirefoxNameForOS
 func getFirefoxNameForOS(os string) string {
 	switch os {
 	case OSDarwin:
@@ -351,6 +353,7 @@ func getFirefoxNameForOS(os string) string {
 	return ""
 }
 
+// getBraveNameForOS
 func getBraveNameForOS(os string) string {
 	switch os {
 	case OSDarwin:
@@ -398,6 +401,62 @@ func init() {
 	log.SetOutput(new(logWriter))
 }
 
+// removeIndex removes specific index from the slice
+func removeIndex(slice []cli.Flag, s int) []cli.Flag {
+	return append(slice[:s], slice[s+1:]...)
+}
+
+// getAllFlags return all flags for the command line
+func getAllFlags(includeSource bool) []cli.Flag {
+	flags := []cli.Flag{
+		&cli.UintFlag{
+			Name:    "tabs",
+			Value:   10,
+			Aliases: []string{"t"},
+			Usage:   "Specify number of tabs\t",
+		},
+		&cli.StringFlag{
+			Name:    "browser",
+			Value:   "",
+			Aliases: []string{"b"},
+			Usage:   "Specify browser\t",
+		},
+		&cli.StringFlag{
+			Name:    "source",
+			Value:   "hn",
+			Aliases: []string{"s"},
+			Usage:   "Specify news source (one of \"hn\", \"reddit\", \"lobsters\", \"dzone\", \"devto\")\t",
+		},
+	}
+
+	if !includeSource {
+		flags = removeIndex(flags, 2)
+	}
+
+	return flags
+}
+
+// getAllActions return all action for the command line
+func getAllActions(c *cli.Context) error {
+	rand.Seed(time.Now().Unix())
+
+	var src Fetcher
+	srcName := []string{"hn", "reddit", "lobsters", "dzone"}[rand.Intn(4)]
+
+	switch srcName {
+	case "hn":
+		src = new(HackerNewsSource)
+	case "reddit":
+		src = new(RedditSource)
+	case "lobsters":
+		src = new(LobstersSource)
+	case "dzone":
+		src = new(DZoneSource)
+	}
+
+	return handleError(RunApp(c.Int("tabs"), c.String("browser"), src))
+}
+
 func main() {
 	app := Init()
 
@@ -416,46 +475,8 @@ func main() {
 				Name:    "run",
 				Aliases: []string{"r"},
 				Usage:   "Start hnreader with default option (10 news and chrome browser)",
-				Flags: []cli.Flag{
-					&cli.UintFlag{
-						Name:    "tabs",
-						Value:   10,
-						Aliases: []string{"t"},
-						Usage:   "Specify number of tabs\t",
-					},
-					&cli.StringFlag{
-						Name:    "browser",
-						Value:   "",
-						Aliases: []string{"b"},
-						Usage:   "Specify browser\t",
-					},
-					&cli.StringFlag{
-						Name:    "source",
-						Value:   "hn",
-						Aliases: []string{"s"},
-						Usage:   "Specify news source (one of \"hn\", \"reddit\", \"lobsters\", \"dzone\", \"devto\")\t",
-					},
-				},
-				Action: func(c *cli.Context) error {
-					var src Fetcher
-
-					switch c.String("source") {
-					case "hn", "hackernews":
-						src = new(HackerNewsSource)
-					case "reddit":
-						src = new(RedditSource)
-					case "lobsters":
-						src = new(LobstersSource)
-					case "dzone":
-						src = new(DZoneSource)
-					case "devto":
-						src = new(DevToSource)
-					default:
-						return handleError(fmt.Errorf("invalid source: %s", c.String("source")))
-					}
-
-					return handleError(RunApp(c.Int("tabs"), c.String("browser"), src))
-				},
+				Flags:   getAllFlags(true),
+				Action:  getAllActions,
 				Before: func(c *cli.Context) error {
 					app.Information()
 					checkGoPath()
@@ -466,39 +487,8 @@ func main() {
 				Name:    "random",
 				Aliases: []string{"rr"},
 				Usage:   "Start hnreader with a randomized source of news",
-				Flags: []cli.Flag{
-					&cli.UintFlag{
-						Name:    "tabs",
-						Value:   10,
-						Aliases: []string{"t"},
-						Usage:   "Specify number of tabs\t",
-					},
-					&cli.StringFlag{
-						Name:    "browser",
-						Value:   "",
-						Aliases: []string{"b"},
-						Usage:   "Specify browser\t",
-					},
-				},
-				Action: func(c *cli.Context) error {
-					rand.Seed(time.Now().Unix())
-
-					var src Fetcher
-					srcName := []string{"hn", "reddit", "lobsters", "dzone"}[rand.Intn(4)]
-
-					switch srcName {
-					case "hn":
-						src = new(HackerNewsSource)
-					case "reddit":
-						src = new(RedditSource)
-					case "lobsters":
-						src = new(LobstersSource)
-					case "dzone":
-						src = new(DZoneSource)
-					}
-
-					return handleError(RunApp(c.Int("tabs"), c.String("browser"), src))
-				},
+				Flags:   getAllFlags(false),
+				Action:  getAllActions,
 				Before: func(c *cli.Context) error {
 					app.Information()
 					checkGoPath()
