@@ -1,6 +1,6 @@
 # Contributing to hnreader
 
-Contributing to hnreader isn't limited to just filing bugs, users are more than welcomed to make suggestions, report any issue they may find, and make pull requests to help make hnreader better.
+Contributing to hnreader isn't limited to just filing bugs, users are more than welcome to make suggestions, report any issue they may find, and make pull requests to help make hnreader better.
 
 ## Working on hnreader
 
@@ -32,7 +32,7 @@ $ cd hnreader
 
 ### Using branches
 
-When working on any issue on Github, it's a good practice to make branches that are specific to the issue you're currently working on. For instance, if you're working on an issue with a name like "NAME OF ISSUE #1234", from the master branch run the following code: `git checkout -b Issue#1234`. In doing so, you'll be making a branch that specifically identifies the issue at hand, and moves you right into it with the `checkout` flag. This keeps your main (master) repository clean and your personal workflow cruft out of sight when making a pull request.
+When working on any issue on Github, it is good practice to make branches that are specific to the issue you're currently working on. For instance, if you're working on an issue with a name like "NAME OF ISSUE #1234", from the master branch run the following code: `git checkout -b Issue#1234`. By doing so, you'll be making a branch that specifically identifies the issue at hand, and moves you right into it with the `checkout` flag. This keeps your main (master) repository clean and your personal workflow cruft out of sight when making a pull request.
 
 ### Finding issues to fix
 
@@ -40,4 +40,4 @@ After you've forked and cloned the repo, you can find issues to work on by headi
 
 ### Rules of the discussions
 
-Remember to be very clear and transparent when discussing any issue in the discussions boards. We ask that you keep the language to English and keep on track with the issue at hand. Lastly, please be respectful of our fellow contributors and keep an exemplary level of professionalism at all times.
+Remember to be very clear and transparent when discussing any issue in the discussions boards. We ask that you keep the language to English and keep on track with the issue at hand. Lastly, please be respectful of our fellow contributors and maintain an exemplary level of professionalism at all times.
