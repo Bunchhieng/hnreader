@@ -57,3 +57,28 @@ func TestGetDZoneStories(t *testing.T) {
 	assert.NotNil(t, news)
 	assert.Equal(t, 10, len(news), "They should be equal")
 }
+
+func TestGetBrowserNameByOS(t *testing.T) {
+	assertErrMsg := "They should be equal"
+
+	os := "darwin"
+	assert.Equal(t, "Firefox", getBrowserNameByOS("firefox", os), assertErrMsg)
+	assert.Equal(t, "Firefox", getBrowserNameByOS("mozilla", os), assertErrMsg)
+	assert.Equal(t, "Google Chrome", getBrowserNameByOS("chrome", os), assertErrMsg)
+	assert.Equal(t, "Google Chrome", getBrowserNameByOS("google", os), assertErrMsg)
+	assert.Equal(t, "Brave", getBrowserNameByOS("brave", os), assertErrMsg)
+
+	os = "linux"
+	assert.Equal(t, "firefox", getBrowserNameByOS("firefox", os), assertErrMsg)
+	assert.Equal(t, "firefox", getBrowserNameByOS("mozilla", os), assertErrMsg)
+	assert.Equal(t, "google-chrome", getBrowserNameByOS("chrome", os), assertErrMsg)
+	assert.Equal(t, "google-chrome", getBrowserNameByOS("google", os), assertErrMsg)
+	assert.Equal(t, "brave", getBrowserNameByOS("brave", os), assertErrMsg)
+
+	os = "windows"
+	assert.Equal(t, "firefox", getBrowserNameByOS("firefox", os), assertErrMsg)
+	assert.Equal(t, "firefox", getBrowserNameByOS("mozilla", os), assertErrMsg)
+	assert.Equal(t, "chrome", getBrowserNameByOS("chrome", os), assertErrMsg)
+	assert.Equal(t, "chrome", getBrowserNameByOS("google", os), assertErrMsg)
+	assert.Equal(t, "brave", getBrowserNameByOS("brave", os), assertErrMsg)
+}

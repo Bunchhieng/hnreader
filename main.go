@@ -18,7 +18,7 @@ import (
 	"github.com/jzelinskie/geddit"
 	"github.com/skratchdot/open-golang/open"
 	"github.com/texttheater/golang-levenshtein/levenshtein"
-	"gopkg.in/urfave/cli.v2"
+	cli "gopkg.in/urfave/cli.v2"
 )
 
 // App information and constants
@@ -27,10 +27,17 @@ const (
 	AppVersion     = "v1.1"
 	AppAuthor      = "Bunchhieng Soth"
 	AppEmail       = "Bunchhieng@gmail.com"
-	AppDescription = "Open multiple news feed in your favorite browser with command line."
+	AppDescription = "Open multiple tech news feeds in your favorite browser through the command line."
 	HackerNewsURL  = "https://news.ycombinator.com/news?p="
 	LobstersURL    = "https://lobste.rs"
 	DZoneURL       = "http://feeds.dzone.com/home"
+)
+
+// Supported operating systems (GOOS)
+const (
+	OSDarwin  = "darwin"
+	OSLinux   = "linux"
+	OSWindows = "windows"
 )
 
 // Colors for console output
@@ -283,31 +290,56 @@ func findBrowser(target string) string {
 		}
 	}
 
-	return getBrowserNameByOS(word)
+	return getBrowserNameByOS(word, runtime.GOOS)
+}
+
+func getGoogleChromeNameForOS(os string) string {
+	switch os {
+	case OSDarwin:
+		return "Google Chrome"
+	case OSLinux:
+		return "google-chrome"
+	case OSWindows:
+		return "chrome"
+	}
+	return ""
+}
+
+func getFirefoxNameForOS(os string) string {
+	switch os {
+	case OSDarwin:
+		return "Firefox"
+	case OSLinux:
+		return "firefox"
+	case OSWindows:
+		return "firefox"
+	}
+	return ""
+}
+
+func getBraveNameForOS(os string) string {
+	switch os {
+	case OSDarwin:
+		return "Brave"
+	case OSLinux:
+		return "brave"
+	case OSWindows:
+		return "brave"
+	}
+	return ""
 }
 
 // getBrowserNameByOS normilizes browser name
-func getBrowserNameByOS(k string) string {
-	browser := ""
-	switch k {
+func getBrowserNameByOS(browserFromCLI, os string) string {
+	switch browserFromCLI {
 	case "google", "chrome":
-		switch runtime.GOOS {
-		case "darwin":
-			browser = "Google Chrome"
-		}
+		return getGoogleChromeNameForOS(os)
 	case "mozilla", "firefox":
-		switch runtime.GOOS {
-		case "darwin":
-			browser = "Firefox"
-		}
+		return getFirefoxNameForOS(os)
 	case "brave":
-		switch runtime.GOOS {
-		case "darwin":
-			browser = "Brave"
-		}
+		return getBraveNameForOS(os)
 	}
-
-	return browser
+	return ""
 }
 
 // checkGoPath checks for GOPATH
@@ -355,13 +387,13 @@ func main() {
 						Name:    "tabs",
 						Value:   10,
 						Aliases: []string{"t"},
-						Usage:   "Specify value of tabs\t",
+						Usage:   "Specify number of tabs\t",
 					},
 					&cli.StringFlag{
 						Name:    "browser",
 						Value:   "",
 						Aliases: []string{"b"},
-						Usage:   "Specify broswer\t",
+						Usage:   "Specify browser\t",
 					},
 					&cli.StringFlag{
 						Name:    "source",
@@ -374,7 +406,7 @@ func main() {
 					var src Fetcher
 
 					switch c.String("source") {
-					case "hn":
+					case "hn", "hackernews":
 						src = new(HackerNewsSource)
 					case "reddit":
 						src = new(RedditSource)
