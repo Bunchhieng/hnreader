@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"math/rand"
 	"net/http"
 	"os"
 	"runtime"
@@ -451,6 +452,49 @@ func main() {
 						src = new(DevToSource)
 					default:
 						return handleError(fmt.Errorf("invalid source: %s", c.String("source")))
+					}
+
+					return handleError(RunApp(c.Int("tabs"), c.String("browser"), src))
+				},
+				Before: func(c *cli.Context) error {
+					app.Information()
+					checkGoPath()
+					return nil
+				},
+			},
+			{
+				Name:    "random",
+				Aliases: []string{"rr"},
+				Usage:   "Start hnreader with a randomized source of news",
+				Flags: []cli.Flag{
+					&cli.UintFlag{
+						Name:    "tabs",
+						Value:   10,
+						Aliases: []string{"t"},
+						Usage:   "Specify number of tabs\t",
+					},
+					&cli.StringFlag{
+						Name:    "browser",
+						Value:   "",
+						Aliases: []string{"b"},
+						Usage:   "Specify browser\t",
+					},
+				},
+				Action: func(c *cli.Context) error {
+					rand.Seed(time.Now().Unix())
+
+					var src Fetcher
+					srcName := []string{"hn", "reddit", "lobsters", "dzone"}[rand.Intn(4)]
+
+					switch srcName {
+					case "hn":
+						src = new(HackerNewsSource)
+					case "reddit":
+						src = new(RedditSource)
+					case "lobsters":
+						src = new(LobstersSource)
+					case "dzone":
+						src = new(DZoneSource)
 					}
 
 					return handleError(RunApp(c.Int("tabs"), c.String("browser"), src))

@@ -55,6 +55,17 @@ $ hnreader r -b "brave" -s "reddit"
 $ hnreader r -b "firefox" -s "reddit" -t 20
 ```
 
+To use hnreader with a randomized source of news, run:
+```
+$ hnreader rr
+```
+
+The following options are available:
+  ```
+  --tabs value, -t value     Specify value of tabs  (default: 10)
+  --browser value, -b value  Specify browser
+  ```
+
 **Tip:** Create a bash alias (for linux and macOS), if you are going to run the same command every morning.
 You can do so by adding the following line (with your preferred options) to the end of your `~/.bashrc` file:
 
