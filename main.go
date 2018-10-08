@@ -259,7 +259,7 @@ func Init() *App {
 // Information prints out app information
 func (app *App) Information() {
 	fmt.Println(blue(app.Name) + " - " + blue(app.Version))
-	fmt.Println(blue(app.Description) + "\n")
+	fmt.Println(blue(app.Description))
 }
 
 func (writer logWriter) Write(bytes []byte) (int, error) {
