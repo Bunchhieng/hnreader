@@ -438,10 +438,15 @@ func getAllFlags(includeSource bool) []cli.Flag {
 
 // getAllActions return all action for the command line
 func getAllActions(c *cli.Context) error {
-	rand.Seed(time.Now().Unix())
-
 	var src Fetcher
-	srcName := []string{"hn", "reddit", "lobsters", "dzone"}[rand.Intn(4)]
+	rand.Seed(time.Now().Unix())
+	srcName := ""
+
+	if c.Command.Name == "random" {
+		srcName = []string{"hn", "reddit", "lobsters", "dzone"}[rand.Intn(4)]
+	} else {
+		srcName = c.String("source")
+	}
 
 	switch srcName {
 	case "hn":
