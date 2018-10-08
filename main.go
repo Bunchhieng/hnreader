@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/xml"
 	"fmt"
 	"log"
 	"math"
@@ -29,6 +30,7 @@ const (
 	AppDescription = "Open multiple tech news feeds in your favorite browser through the command line."
 	HackerNewsURL  = "https://news.ycombinator.com/news?p="
 	LobstersURL    = "https://lobste.rs"
+	DZoneURL       = "http://feeds.dzone.com/home"
 )
 
 // Supported operating systems (GOOS)
@@ -42,6 +44,16 @@ const (
 var blue = color.New(color.FgBlue, color.Bold).SprintFunc()
 var yellow = color.New(color.FgYellow, color.Bold).SprintFunc()
 var red = color.New(color.FgRed, color.Bold).SprintFunc()
+
+// Rss decode RSS xml
+type Rss struct {
+	Item []RssItem `xml:"channel>item"`
+}
+
+// RssItem item with link to news
+type RssItem struct {
+	Link string `xml:"link"`
+}
 
 type logWriter struct{}
 
@@ -65,9 +77,17 @@ func (hn *HackerNewsSource) Fetch(count int) (map[int]string, error) {
 	pages := count / 30
 	for i := 0; i <= pages; i++ {
 		resp, err := http.Get(HackerNewsURL + strconv.Itoa(pages))
-		handleError(err)
+		if err != nil {
+			handleError(err)
+			continue
+		}
+
 		doc, err := goquery.NewDocumentFromReader(resp.Body)
-		handleError(err)
+		if err != nil {
+			handleError(err)
+			continue
+		}
+
 		doc.Find("a.storylink").Each(func(i int, s *goquery.Selection) {
 			href, exist := s.Attr("href")
 			if !exist {
@@ -75,6 +95,8 @@ func (hn *HackerNewsSource) Fetch(count int) (map[int]string, error) {
 			}
 			news[i] = href
 		})
+
+		resp.Body.Close()
 	}
 
 	return news, nil
@@ -96,11 +118,15 @@ func (rs *RedditSource) Fetch(count int) (map[int]string, error) {
 			Limit: count,
 		},
 	)
-	handleError(err)
+
+	if err != nil {
+		return news, err
+	}
 
 	for i, sub := range subs {
 		news[i] = sub.URL
 	}
+
 	return news, nil
 }
 
@@ -117,10 +143,16 @@ func (l *LobstersSource) Fetch(count int) (map[int]string, error) {
 	for p := 1; p <= pages; p++ {
 		url := fmt.Sprintf("%s/page/%d", LobstersURL, p)
 		resp, err := http.Get(url)
-		handleError(err)
+		if err != nil {
+			handleError(err)
+			continue
+		}
 
 		doc, err := goquery.NewDocumentFromReader(resp.Body)
-		handleError(err)
+		if err != nil {
+			handleError(err)
+			continue
+		}
 
 		doc.Find(".link a.u-url").Each(func(_ int, s *goquery.Selection) {
 			href, exist := s.Attr("href")
@@ -142,6 +174,38 @@ func (l *LobstersSource) Fetch(count int) (map[int]string, error) {
 		})
 
 		resp.Body.Close()
+	}
+
+	return news, nil
+}
+
+// DZoneSource fetches latest stories from http://feeds.dzone.com/home
+type DZoneSource struct{}
+
+// Fetch gets news from the DZone
+func (l *DZoneSource) Fetch(count int) (map[int]string, error) {
+	news := make(map[int]string)
+
+	resp, err := http.Get(DZoneURL)
+	if err != nil {
+		return news, err
+	}
+
+	defer resp.Body.Close()
+
+	doc := Rss{}
+	d := xml.NewDecoder(resp.Body)
+
+	if err := d.Decode(&doc); err != nil {
+		return news, err
+	}
+
+	for i, item := range doc.Item {
+		if i >= count {
+			break
+		}
+
+		news[i] = item.Link
 	}
 
 	return news, nil
@@ -335,7 +399,7 @@ func main() {
 						Name:    "source",
 						Value:   "hn",
 						Aliases: []string{"s"},
-						Usage:   "Specify news source (one of \"hn\", \"reddit\", \"lobsters\")\t",
+						Usage:   "Specify news source (one of \"hn\", \"reddit\", \"lobsters\", \"dzone\")\t",
 					},
 				},
 				Action: func(c *cli.Context) error {
@@ -348,6 +412,8 @@ func main() {
 						src = new(RedditSource)
 					case "lobsters":
 						src = new(LobstersSource)
+					case "dzone":
+						src = new(DZoneSource)
 					default:
 						return handleError(fmt.Errorf("invalid source: %s", c.String("source")))
 					}
