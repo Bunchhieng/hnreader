@@ -211,7 +211,7 @@ func (l *DZoneSource) Fetch(count int) (map[int]string, error) {
 	return news, nil
 }
 
-// Init initalizes the app
+// Init initializes the app
 func Init() *App {
 	return &App{
 		Name:        AppName,
