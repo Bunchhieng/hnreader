@@ -1,8 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"encoding/xml"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"math"
 	"math/rand"
@@ -33,6 +35,7 @@ const (
 	LobstersURL    = "https://lobste.rs"
 	DZoneURL       = "http://feeds.dzone.com/home"
 	DevToURL       = "https://dev.to/feed"
+	SteemItURL     = "https://api.steemjs.com/getState?path=/trending/technology&scope=content"
 )
 
 // Supported operating systems (GOOS)
@@ -245,6 +248,45 @@ func (l *DevToSource) Fetch(count int) (map[int]string, error) {
 	return news, nil
 }
 
+type SteemItSource struct {}
+
+func (l *SteemItSource) Fetch(count int) (map[int]string, error) {
+	news := make(map[int]string)
+
+	resp, err := http.Get(SteemItURL)
+	if err != nil {
+		return news, err
+	}
+
+	defer resp.Body.Close()
+
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return news, err
+	}
+
+	m := make(map[string]map[string]interface{})
+	err = json.Unmarshal(data, &m)
+	if err != nil {
+		return news, err
+	}
+
+	idx := 0
+	for _, value := range m {
+		if idx >= count {
+			break
+		}
+
+		str, ok := value["url"].(string)
+		if ok {
+			news[idx] = str
+			idx++
+		}
+	}
+
+	return news, nil
+}
+
 // Init initializes the app
 func Init() *App {
 	return &App{
@@ -425,7 +467,7 @@ func getAllFlags(includeSource bool) []cli.Flag {
 			Name:    "source",
 			Value:   "hn",
 			Aliases: []string{"s"},
-			Usage:   "Specify news source (one of \"hn\", \"reddit\", \"lobsters\", \"dzone\", \"devto\")\t",
+			Usage:   "Specify news source (one of \"hn\", \"reddit\", \"lobsters\", \"dzone\", \"devto\", \"steemit\")\t",
 		},
 	}
 
@@ -443,7 +485,7 @@ func getAllActions(c *cli.Context) error {
 	srcName := ""
 
 	if c.Command.Name == "random" {
-		srcName = []string{"hn", "reddit", "lobsters", "dzone"}[rand.Intn(4)]
+		srcName = []string{"hn", "reddit", "lobsters", "dzone", "steemit"}[rand.Intn(4)]
 	} else {
 		srcName = c.String("source")
 	}
@@ -457,6 +499,8 @@ func getAllActions(c *cli.Context) error {
 		src = new(LobstersSource)
 	case "dzone":
 		src = new(DZoneSource)
+	case "steemit":
+		src = new(SteemItSource)
 	}
 
 	return handleError(RunApp(c.Int("tabs"), c.String("browser"), src))

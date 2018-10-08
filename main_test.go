@@ -69,6 +69,17 @@ func TestGetDevToStories(t *testing.T) {
 	assert.Equal(t, 10, len(news), "They should be equal")
 }
 
+func TestGetSteemItStories(t *testing.T) {
+	news, err := new(SteemItSource).Fetch(10)
+	assert.Nil(t, err)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	assert.NotNil(t, news)
+	assert.Equal(t, 10, len(news), "They should be equal")
+}
+
 func TestGetBrowserNameByOS(t *testing.T) {
 	assertErrMsg := "They should be equal"
 
