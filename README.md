@@ -104,7 +104,3 @@ Please see the [CONTRIBUTING.md](CONTRIBUTING.md)
 #### License
 
 The MIT License (MIT)
-
-```
-
-```
