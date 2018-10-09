@@ -351,7 +351,7 @@ func findBrowser(target string) string {
 	if target == "" {
 		return ""
 	}
-	browsers := []string{"google", "chrome", "mozilla", "firefox", "brave"}
+	browsers := []string{"google", "chrome", "mozilla", "firefox", "brave", "safari"}
 	shortest := -1
 	word := ""
 	for _, browser := range browsers {
@@ -408,6 +408,19 @@ func getBraveNameForOS(os string) string {
 	return ""
 }
 
+// getSafariNameForOS
+func getSafariNameForOS(os string) string {
+	switch os {
+	case OSDarwin:
+		return "Safari"
+	case OSLinux:
+		return "safari"
+	case OSWindows:
+		return "safari"
+	}
+	return ""
+}
+
 // getBrowserNameByOS normilizes browser name
 func getBrowserNameByOS(browserFromCLI, os string) string {
 	switch browserFromCLI {
@@ -417,6 +430,8 @@ func getBrowserNameByOS(browserFromCLI, os string) string {
 		return getFirefoxNameForOS(os)
 	case "brave":
 		return getBraveNameForOS(os)
+	case "safari":
+		return getSafariNameForOS(os)
 	}
 	return ""
 }
