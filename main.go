@@ -248,8 +248,10 @@ func (l *DevToSource) Fetch(count int) (map[int]string, error) {
 	return news, nil
 }
 
-type SteemItSource struct {}
+// SteemItSource fetches latest news from SteemIt
+type SteemItSource struct{}
 
+// Fetch gets data from SteemIt
 func (l *SteemItSource) Fetch(count int) (map[int]string, error) {
 	news := make(map[int]string)
 
@@ -304,6 +306,7 @@ func (app *App) Information() {
 	fmt.Println(blue(app.Description))
 }
 
+// Write logs to console
 func (writer logWriter) Write(bytes []byte) (int, error) {
 	return fmt.Print(yellow("[") + time.Now().UTC().Format("15:04:05") + yellow("]") + string(bytes))
 }
@@ -476,7 +479,7 @@ func getAllFlags(includeSource bool) []cli.Flag {
 			Name:    "browser",
 			Value:   "",
 			Aliases: []string{"b"},
-			Usage:   "Specify browser\t",
+			Usage:   "Specify browser (one of \"chrome\", \"brave\", \"safari\", \"firefox\")\t",
 		},
 		&cli.StringFlag{
 			Name:    "source",
@@ -500,7 +503,7 @@ func getAllActions(c *cli.Context) error {
 	srcName := ""
 
 	if c.Command.Name == "random" {
-		srcName = []string{"hn", "reddit", "lobsters", "dzone", "steemit"}[rand.Intn(4)]
+		srcName = []string{"hn", "reddit", "lobsters", "dzone", "devto", "steemit"}[rand.Intn(5)]
 	} else {
 		srcName = c.String("source")
 	}
@@ -514,8 +517,13 @@ func getAllActions(c *cli.Context) error {
 		src = new(LobstersSource)
 	case "dzone":
 		src = new(DZoneSource)
+	case "devto":
+		src = new(DevToSource)
 	case "steemit":
 		src = new(SteemItSource)
+	default:
+		fmt.Printf(red("%s is not a valid source name, trying default source (Hacker news)...\n"), srcName)
+		src = new(HackerNewsSource)
 	}
 
 	return handleError(RunApp(c.Int("tabs"), c.String("browser"), src))

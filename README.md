@@ -15,7 +15,7 @@ hnreader (Hackernews Reader) allows you to open tech news feeds in your favorite
   For example: To download and install version 1.1 for linux, you may run the following.
 
   ```
-  $ sudo curl -L https://github.com/FrontSide/hnreader/releases/download/v1.1/hnreader-v1.1.linux.x86_64 > /usr/local/bin/hnreader && chmod +x /usr/local/bin/hnreader
+  $ sudo curl -L https://github.com/Bunchhieng/hnreader/releases/download/v1.1/hnreader-v1.1.linux.x86_64 > /usr/local/bin/hnreader && chmod +x /usr/local/bin/hnreader
   ```
 
 - **or** install the Go package
@@ -57,9 +57,10 @@ $ hnreader help rr
 There are a number of customization options:
 
 ```
---tabs value, -t value Specify value of tabs (default: 10)
---browser value, -b value Specify browser
---source value, -s value Specify news source (one of "hn", "reddit", "lobsters") (default: "hn")
+   --tabs value, -t value     Specify number of tabs   (default: 10)
+   --browser value, -b value  Specify browser
+   --source value, -s value   Specify news source (one of "hn", "reddit", "lobsters", "dzone", "devto", "steemit")   (default: "hn")
+   --help, -h                 show help (default: false)
 ```
 
 Examples with options:
