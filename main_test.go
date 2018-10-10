@@ -89,6 +89,7 @@ func TestGetBrowserNameByOS(t *testing.T) {
 	assert.Equal(t, "Google Chrome", getBrowserNameByOS("chrome", os), assertErrMsg)
 	assert.Equal(t, "Google Chrome", getBrowserNameByOS("google", os), assertErrMsg)
 	assert.Equal(t, "Brave", getBrowserNameByOS("brave", os), assertErrMsg)
+	assert.Equal(t, "Safari", getBrowserNameByOS("safari", os), assertErrMsg)
 
 	os = "linux"
 	assert.Equal(t, "firefox", getBrowserNameByOS("firefox", os), assertErrMsg)
@@ -96,6 +97,7 @@ func TestGetBrowserNameByOS(t *testing.T) {
 	assert.Equal(t, "google-chrome", getBrowserNameByOS("chrome", os), assertErrMsg)
 	assert.Equal(t, "google-chrome", getBrowserNameByOS("google", os), assertErrMsg)
 	assert.Equal(t, "brave", getBrowserNameByOS("brave", os), assertErrMsg)
+	assert.Equal(t, "safari", getBrowserNameByOS("safari", os), assertErrMsg)
 
 	os = "windows"
 	assert.Equal(t, "firefox", getBrowserNameByOS("firefox", os), assertErrMsg)
@@ -103,4 +105,5 @@ func TestGetBrowserNameByOS(t *testing.T) {
 	assert.Equal(t, "chrome", getBrowserNameByOS("chrome", os), assertErrMsg)
 	assert.Equal(t, "chrome", getBrowserNameByOS("google", os), assertErrMsg)
 	assert.Equal(t, "brave", getBrowserNameByOS("brave", os), assertErrMsg)
+	assert.Equal(t, "safari", getBrowserNameByOS("safari", os), assertErrMsg)
 }
