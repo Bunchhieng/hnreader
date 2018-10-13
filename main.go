@@ -354,7 +354,7 @@ func findBrowser(target string) string {
 	if target == "" {
 		return ""
 	}
-	browsers := []string{"google", "chrome", "mozilla", "firefox", "brave", "safari"}
+	browsers := []string{"google", "chrome", "mozilla", "firefox", "brave", "safari", "opera"}
 	shortest := -1
 	word := ""
 	for _, browser := range browsers {
@@ -424,6 +424,19 @@ func getSafariNameForOS(os string) string {
 	return ""
 }
 
+// getOperaNameForOS
+func getOperaNameForOS(os string) string {
+	switch os {
+	case OSDarwin:
+		return "Opera"
+	case OSLinux:
+		return "opera"
+	case OSWindows:
+		return "opera"
+	}
+	return ""
+}
+
 // getBrowserNameByOS normilizes browser name
 func getBrowserNameByOS(browserFromCLI, os string) string {
 	switch browserFromCLI {
@@ -435,6 +448,8 @@ func getBrowserNameByOS(browserFromCLI, os string) string {
 		return getBraveNameForOS(os)
 	case "safari":
 		return getSafariNameForOS(os)
+	case "opera":
+		return getOperaNameForOS(os)
 	}
 	return ""
 }
@@ -479,7 +494,7 @@ func getAllFlags(includeSource bool) []cli.Flag {
 			Name:    "browser",
 			Value:   "",
 			Aliases: []string{"b"},
-			Usage:   "Specify browser (one of \"chrome\", \"brave\", \"safari\", \"firefox\")\t",
+			Usage:   "Specify browser (one of \"chrome\", \"brave\", \"safari\", \"firefox\", \"opera\")\t",
 		},
 		&cli.StringFlag{
 			Name:    "source",
