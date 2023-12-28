@@ -1,0 +1,69 @@
+# github.com/PuerkitoBio/goquery v1.4.1
+## explicit
+github.com/PuerkitoBio/goquery
+# github.com/andybalholm/cascadia v1.0.0
+## explicit
+github.com/andybalholm/cascadia
+# github.com/beefsack/go-rate v0.0.0-20180408011153-efa7637bb9b6
+## explicit
+github.com/beefsack/go-rate
+# github.com/davecgh/go-spew v1.1.1
+## explicit
+github.com/davecgh/go-spew/spew
+# github.com/fatih/color v1.7.0
+## explicit
+github.com/fatih/color
+# github.com/golang/protobuf v1.2.0
+## explicit
+github.com/golang/protobuf/proto
+# github.com/google/go-querystring v1.0.0
+## explicit
+github.com/google/go-querystring/query
+# github.com/jzelinskie/geddit v0.0.0-20181001045958-34240685d019
+## explicit
+github.com/jzelinskie/geddit
+# github.com/mattn/go-colorable v0.0.9
+## explicit
+github.com/mattn/go-colorable
+# github.com/mattn/go-isatty v0.0.4
+## explicit
+github.com/mattn/go-isatty
+# github.com/pmezard/go-difflib v1.0.0
+## explicit
+github.com/pmezard/go-difflib/difflib
+# github.com/skratchdot/open-golang v0.0.0-20160302144031-75fb7ed4208c
+## explicit
+github.com/skratchdot/open-golang/open
+# github.com/stretchr/testify v1.2.2
+## explicit
+github.com/stretchr/testify/assert
+# github.com/texttheater/golang-levenshtein v0.0.0-20180516184445-d188e65d659e
+## explicit
+github.com/texttheater/golang-levenshtein/levenshtein
+# golang.org/x/net v0.0.0-20180926154720-4dfa2610cdf3
+## explicit
+golang.org/x/net/context
+golang.org/x/net/context/ctxhttp
+golang.org/x/net/html
+golang.org/x/net/html/atom
+# golang.org/x/oauth2 v0.0.0-20180821212333-d2e6202438be
+## explicit
+golang.org/x/oauth2
+golang.org/x/oauth2/internal
+# golang.org/x/sync v0.5.0
+## explicit; go 1.18
+# golang.org/x/sys v0.0.0-20180928133829-e4b3c5e90611
+## explicit
+golang.org/x/sys/unix
+# google.golang.org/appengine v1.2.0
+## explicit
+google.golang.org/appengine/internal
+google.golang.org/appengine/internal/base
+google.golang.org/appengine/internal/datastore
+google.golang.org/appengine/internal/log
+google.golang.org/appengine/internal/remote_api
+google.golang.org/appengine/internal/urlfetch
+google.golang.org/appengine/urlfetch
+# gopkg.in/urfave/cli.v2 v2.0.0-20180128182452-d3ae77c26ac8
+## explicit
+gopkg.in/urfave/cli.v2
