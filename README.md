@@ -1,6 +1,6 @@
 # hnreader
 
-Stay up to date with the latest news in technology from your favourite programming sites, all aggregated into one feed.
+Stay up to date with the latest news in technology from your favorite programming sites, all aggregated into one feed.
 
 hnreader (Hackernews Reader) allows you to open tech news feeds in your favorite browser from the command line.
 
@@ -12,46 +12,46 @@ hnreader (Hackernews Reader) allows you to open tech news feeds in your favorite
 
 - Download the binary from the hndreader [GitHub Release Page](github.com/FrontSide/hnreader/releases)
 
-  For example: To download and install version 1.1 for linux, you may run the following.
+  For example: To download and install version 1.1 for Linux, you may run the following.
 
   ```
-  $ sudo curl -L https://github.com/Bunchhieng/hnreader/releases/download/v1.1/hnreader-v1.1.linux.x86_64 > /usr/local/bin/hnreader && chmod +x /usr/local/bin/hnreader
+  sudo curl -L https://github.com/Bunchhieng/hnreader/releases/download/v1.1/hnreader-v1.1.linux.x86_64 > /usr/local/bin/hnreader && chmod +x /usr/local/bin/hnreader
   ```
 
 - **or** install the Go package
 
   ```
-  $ go get -u github.com/Bunchhieng/hnreader
+  go get -u github.com/Bunchhieng/hnreader
   ```
 
-  Note that **this option requires** you to have **golang** already
-  installed. You can install go with your operation system's package manager or download it from [golang.org/dl/](https://golang.org/dl/).
+  Note that **this option requires** you to have **Golang** already
+  installed. You can install Go with your operation system's package manager or download it from [golang.org/dl/](https://golang.org/dl/).
 
   Don't forget to set your GOPATH and PATH environment variables:
 
   ```
-  $ export GOPATH=/path/to/your/go/workspace
-  $ export PATH=$GOPATH/bin:$PATH
+  export GOPATH=/path/to/your/go/workspace
+  export PATH=$GOPATH/bin:$PATH
   ```
 
 #### Usage
 
-To use hnreader with its default options (Opens 10 news sites with chrome), simply run:
+To use hnreader with its default options (Opens 10 news sites with Chrome), simply run:
 
 ```
-$ hnreader r
+hnreader r
 ```
 
 To see all available flags for each command:
 
 ```
-$ hnreader help r
+hnreader help r
 ```
 
 OR
 
 ```
-$ hnreader help rr
+hnreader help rr
 ```
 
 There are a number of customization options:
@@ -66,15 +66,15 @@ There are a number of customization options:
 Examples with options:
 
 ```
-$ hnreader r -t 31 -b "firefox"
-$ hnreader r -b "brave" -s "reddit"
-$ hnreader r -b "firefox" -s "reddit" -t 20
+hnreader r -t 31 -b "firefox"
+hnreader r -b "brave" -s "reddit"
+hnreader r -b "firefox" -s "reddit" -t 20
 ```
 
 To use hnreader with a randomized source of news, run:
 
 ```
-$ hnreader rr
+hnreader rr
 ```
 
 The following options are available:
@@ -84,11 +84,11 @@ The following options are available:
 --browser value, -b value Specify browser
 ```
 
-**Tip:** Create a bash alias (for linux and macOS), if you are going to run the same command every morning.
+**Tip:** Create a bash alias (for Linux and macOS), if you are going to run the same command every morning.
 You can do so by adding the following line (with your preferred options) to the end of your `~/.bashrc` file:
 
 ```
-alias hnr='hnreader r -b "firefox" -s "reddit" -t 30' >> ~/.bashrc
+alias hnr='hnreader r -b "firefox" -s "Reddit" -t 30' >> ~/.bashrc
 ```
 
 #### Contribution
