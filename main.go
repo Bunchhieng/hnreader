@@ -93,7 +93,7 @@ func (hn *HackerNewsSource) Fetch(count int) (map[int]string, error) {
 			continue
 		}
 
-		doc.Find("a.storylink").Each(func(i int, s *goquery.Selection) {
+		doc.Find("span.titleline > a").Each(func(i int, s *goquery.Selection) {
 			href, exist := s.Attr("href")
 			if !exist {
 				fmt.Println(red("can't find any stories..."))
@@ -311,7 +311,7 @@ func (writer logWriter) Write(bytes []byte) (int, error) {
 	return fmt.Print(yellow("[") + time.Now().UTC().Format("15:04:05") + yellow("]") + string(bytes))
 }
 
-//RunApp opens a browser with input tabs count
+// RunApp opens a browser with input tabs count
 func RunApp(tabs int, browser string, src Fetcher) error {
 	news, err := src.Fetch(tabs)
 	handleError(err)
@@ -514,9 +514,8 @@ func getAllFlags(includeSource bool) []cli.Flag {
 // getAllActions return all action for the command line
 func getAllActions(c *cli.Context) error {
 	var src Fetcher
-	rand.Seed(time.Now().Unix())
+	rand.NewSource(time.Now().UnixNano())
 	srcName := ""
-
 	if c.Command.Name == "random" {
 		srcName = []string{"hn", "reddit", "lobsters", "dzone", "devto", "steemit"}[rand.Intn(5)]
 	} else {

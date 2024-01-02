@@ -1,7 +1,5 @@
 # hnreader
 
-Stay up to date with the latest news in technology from your favorite programming sites, all aggregated into one feed.
-
 hnreader (Hackernews Reader) allows you to open tech news feeds in your favorite browser from the command line.
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/Bunchhieng/hnreader)](https://goreportcard.com/report/github.com/Bunchhieng/hnreader) [![Build Status](https://travis-ci.org/Bunchhieng/hnreader.svg?branch=master)](https://travis-ci.org/Bunchhieng/hnreader)
