@@ -390,9 +390,7 @@ func getFirefoxNameForOS(os string) string {
 	switch os {
 	case OSDarwin:
 		return "Firefox"
-	case OSLinux:
-		return "firefox"
-	case OSWindows:
+	case OSLinux, OSWindows:
 		return "firefox"
 	}
 	return ""
@@ -403,9 +401,7 @@ func getBraveNameForOS(os string) string {
 	switch os {
 	case OSDarwin:
 		return "Brave"
-	case OSLinux:
-		return "brave"
-	case OSWindows:
+	case OSLinux, OSWindows:
 		return "brave"
 	}
 	return ""
@@ -416,9 +412,7 @@ func getSafariNameForOS(os string) string {
 	switch os {
 	case OSDarwin:
 		return "Safari"
-	case OSLinux:
-		return "safari"
-	case OSWindows:
+	case OSLinux, OSWindows:
 		return "safari"
 	}
 	return ""
@@ -429,9 +423,7 @@ func getOperaNameForOS(os string) string {
 	switch os {
 	case OSDarwin:
 		return "Opera"
-	case OSLinux:
-		return "opera"
-	case OSWindows:
+	case OSLinux, OSWindows:
 		return "opera"
 	}
 	return ""
