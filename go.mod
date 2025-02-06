@@ -10,6 +10,7 @@ require (
 	github.com/stretchr/testify v1.2.2
 	github.com/texttheater/golang-levenshtein v0.0.0-20180516184445-d188e65d659e
 	gopkg.in/urfave/cli.v2 v2.0.0-20180128182452-d3ae77c26ac8
+	golang.org/x/time v0.3.0
 )
 
 require (

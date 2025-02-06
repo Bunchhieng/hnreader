@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
@@ -20,7 +21,6 @@ import (
 	"github.com/fatih/color"
 	"github.com/jzelinskie/geddit"
 	"github.com/skratchdot/open-golang/open"
-	"github.com/texttheater/golang-levenshtein/levenshtein"
 	cli "gopkg.in/urfave/cli.v2"
 )
 
@@ -78,15 +78,32 @@ type HackerNewsSource struct{}
 // Fetch gets news from the HackerNews
 func (hn *HackerNewsSource) Fetch(count int) (map[int]string, error) {
 	news := make(map[int]string)
-	// 30 news per page
 	pages := count / 30
+	
+	client := &http.Client{
+		Timeout: 10 * time.Second,
+	}
+	
 	for i := 0; i <= pages; i++ {
-		resp, err := http.Get(HackerNewsURL + strconv.Itoa(pages))
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, HackerNewsURL+strconv.Itoa(pages), nil)
 		if err != nil {
-			handleError(err)
-			continue
+			return nil, fmt.Errorf("creating request: %w", err)
 		}
-
+		
+		resp, err := client.Do(req)
+		if err != nil {
+			return nil, fmt.Errorf("fetching page %d: %w", i, err)
+		}
+		defer resp.Body.Close()
+		
+		// Add response status code check
+		if resp.StatusCode != http.StatusOK {
+			return nil, fmt.Errorf("unexpected status code %d from page %d", resp.StatusCode, i)
+		}
+		
 		doc, err := goquery.NewDocumentFromReader(resp.Body)
 		if err != nil {
 			handleError(err)
@@ -100,8 +117,6 @@ func (hn *HackerNewsSource) Fetch(count int) (map[int]string, error) {
 			}
 			news[i] = href
 		})
-
-		resp.Body.Close()
 	}
 
 	return news, nil
@@ -313,9 +328,19 @@ func (writer logWriter) Write(bytes []byte) (int, error) {
 
 // RunApp opens a browser with input tabs count
 func RunApp(tabs int, browser string, src Fetcher) error {
+	if tabs <= 0 {
+		return fmt.Errorf("invalid number of tabs: %d", tabs)
+	}
+	
 	news, err := src.Fetch(tabs)
-	handleError(err)
-
+	if err != nil {
+		return fmt.Errorf("fetching news: %w", err)
+	}
+	
+	if len(news) == 0 {
+		return fmt.Errorf("no news items found")
+	}
+	
 	browser = findBrowser(browser)
 
 	// To store the keys in slice in sorted order
@@ -349,27 +374,40 @@ func RunApp(tabs int, browser string, src Fetcher) error {
 	return nil
 }
 
-// findBrowser
 func findBrowser(target string) string {
 	if target == "" {
 		return ""
 	}
-	browsers := []string{"google", "chrome", "mozilla", "firefox", "brave", "safari", "opera"}
-	shortest := -1
-	word := ""
-	for _, browser := range browsers {
-		distance := levenshtein.DistanceForStrings([]rune(browser), []rune(target), levenshtein.DefaultOptions)
-		if distance == 0 {
-			word = browser
-			break
-		}
-		if distance <= shortest || shortest < 0 {
-			shortest = distance
-			word = browser
+	
+	normalizedTarget := strings.ToLower(strings.TrimSpace(target))
+	browsers := map[string][]string{
+		"chrome":  {"google", "chrome", "google-chrome"},
+		"firefox": {"mozilla", "firefox"},
+		"brave":   {"brave"},
+		"safari":  {"safari"},
+		"opera":   {"opera"},
+	}
+	
+	// Direct match
+	for browser, aliases := range browsers {
+		for _, alias := range aliases {
+			if normalizedTarget == alias {
+				return getBrowserNameByOS(browser, runtime.GOOS)
+			}
 		}
 	}
-
-	return getBrowserNameByOS(word, runtime.GOOS)
+	
+	// Partial match
+	for browser, aliases := range browsers {
+		for _, alias := range aliases {
+			if strings.Contains(alias, normalizedTarget) || strings.Contains(normalizedTarget, alias) {
+				return getBrowserNameByOS(browser, runtime.GOOS)
+			}
+		}
+	}
+	
+	// If no match found, return empty string
+	return ""
 }
 
 // getGoogleChromeNameForOS
@@ -513,34 +551,94 @@ func getAllFlags(includeSource bool) []cli.Flag {
 
 // getAllActions return all action for the command line
 func getAllActions(c *cli.Context) error {
-	var src Fetcher
-	rand.NewSource(time.Now().UnixNano())
-	srcName := ""
+	cfg := NewConfig()
+	
+	// Validate tabs
+	tabs := c.Int("tabs")
+	if tabs <= 0 || tabs > cfg.MaxTabs {
+		return fmt.Errorf("invalid number of tabs (must be between 1 and %d)", cfg.MaxTabs)
+	}
+	
+	// Get and validate source
+	var srcName string
 	if c.Command.Name == "random" {
-		srcName = []string{"hn", "reddit", "lobsters", "dzone", "devto", "steemit"}[rand.Intn(5)]
+		rand.Seed(time.Now().UnixNano())
+		srcName = cfg.Sources[rand.Intn(len(cfg.Sources))]
 	} else {
 		srcName = c.String("source")
 	}
-
-	switch srcName {
-	case "hn":
-		src = new(HackerNewsSource)
-	case "reddit":
-		src = new(RedditSource)
-	case "lobsters":
-		src = new(LobstersSource)
-	case "dzone":
-		src = new(DZoneSource)
-	case "devto":
-		src = new(DevToSource)
-	case "steemit":
-		src = new(SteemItSource)
-	default:
-		fmt.Printf(red("%s is not a valid source name, trying default source (Hacker news)...\n"), srcName)
-		src = new(HackerNewsSource)
+	
+	src, err := validateSource(srcName, cfg)
+	if err != nil {
+		return err
 	}
+	
+	// Run the app
+	return RunApp(tabs, c.String("browser"), src)
+}
 
-	return handleError(RunApp(c.Int("tabs"), c.String("browser"), src))
+// Add configuration struct
+type Config struct {
+	MaxTabs     int
+	DefaultTabs int
+	Sources     []string
+	Browsers    []string
+	HTTPTimeout time.Duration
+}
+
+func NewConfig() *Config {
+	return &Config{
+		MaxTabs:     50,
+		DefaultTabs: 10,
+		Sources:     []string{"hn", "reddit", "lobsters", "dzone", "devto", "steemit"},
+		Browsers:    []string{"chrome", "firefox", "brave", "safari", "opera"},
+		HTTPTimeout: 10 * time.Second,
+	}
+}
+
+// Add source validation
+func validateSource(srcName string, cfg *Config) (Fetcher, error) {
+	srcName = strings.ToLower(strings.TrimSpace(srcName))
+	
+	for _, validSource := range cfg.Sources {
+		if srcName == validSource {
+			switch srcName {
+			case "hn":
+				return new(HackerNewsSource), nil
+			case "reddit":
+				return new(RedditSource), nil
+			case "lobsters":
+				return new(LobstersSource), nil
+			case "dzone":
+				return new(DZoneSource), nil
+			case "devto":
+				return new(DevToSource), nil
+			case "steemit":
+				return new(SteemItSource), nil
+			}
+		}
+	}
+	
+	return nil, fmt.Errorf("invalid source: %s", srcName)
+}
+
+// Add structured logging
+type Logger struct {
+	*log.Logger
+}
+
+func NewLogger() *Logger {
+	return &Logger{
+		Logger: log.New(os.Stdout, "", log.LstdFlags),
+	}
+}
+
+func (l *Logger) Info(format string, v ...interface{}) {
+	l.Printf("[INFO] "+format, v...)
+}
+
+func (l *Logger) Error(format string, v ...interface{}) {
+	l.Printf("[ERROR] "+format, v...)
 }
 
 func main() {
