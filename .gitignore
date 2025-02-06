@@ -31,3 +31,5 @@ _testmain.go
 
 # Workflow tools
 Makefile
+
+.DS_Store
